@@ -1,0 +1,53 @@
+﻿@model IEnumerable<ClimateControl.Web.Models.SensorData>
+
+@{
+    ViewBag.Title = "Sensor data";
+}
+
+<h2>Sensor data</h2>
+<br/>
+
+<table class="table">
+    <tr>
+        <th>
+            Device name
+        </th>
+        <th>
+            Temperature, C
+        </th>
+        <th>
+            Humidity, %
+        </th>
+        <th>
+            CO2
+        </th>
+        <th>
+            Time
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.deviceId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.temperature)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.humidity)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.co2)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EventEnqueuedUtcTime)
+        </td>
+        <td>
+            @Html.ActionLink("Details", "Details", new { id=item.Id })          
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,66 @@
+﻿@model ClimateControl.Web.Models.SensorData
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>SensorData</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.deviceId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.deviceId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.temperature)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.temperature)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.humidity)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.humidity)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.co2)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.co2)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EventProcessedUtcTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EventProcessedUtcTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EventEnqueuedUtcTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EventEnqueuedUtcTime)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
