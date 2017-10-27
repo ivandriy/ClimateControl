@@ -16,15 +16,19 @@ namespace ClimateControl.Web.Models
     public partial class SensorData
     {
         public int Id { get; set; }
+        [Display(Name = "Device name")]
         public string deviceId { get; set; }
         [DisplayFormat(DataFormatString = "{0:0.00}")]
+        [Display(Name = "Temperature,C")]
         public double temperature { get; set; }
         [DisplayFormat(DataFormatString = "{0:F1}")]
+        [Display(Name = "Humidity,%")]
         public double humidity { get; set; }
+        [Display(Name = "CO2")]
         public double co2 { get; set; }
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy HH:MM:ss}")]
+        [Display(Name = "Time Processed")]        
         public System.DateTime EventProcessedUtcTime { get; set; }
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy HH:MM:ss}")]
+        [Display(Name = "Time Enqueued")]        
         public System.DateTime EventEnqueuedUtcTime { get; set; }
     }
 }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ClimateControl.Web.Models;
+using PagedList;
 
 namespace ClimateControl.Web.Controllers
 {
@@ -14,11 +15,64 @@ namespace ClimateControl.Web.Controllers
     {
         private ClimateControlEntities db = new ClimateControlEntities();
 
-        // GET: Sensor
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, int? page)
         {
-            return View(db.SensorData.ToList());
+            ViewBag.CurrentSort = sortOrder;
+            var sensorData = from s in db.SensorData
+                             select s;
+            switch (sortOrder)
+            {
+                case "date_asc":
+                    sensorData = sensorData.OrderBy(s => s.EventEnqueuedUtcTime);
+                    ViewBag.DateSortParam = "date_desc";
+                    ViewBag.TempSortParam = "temp_desc";
+                    ViewBag.HumSortParam = "hum_desc";
+                    ViewBag.CO2SortParam = "co2_desc";
+                    break;
+                case "date_desc":
+                    sensorData = sensorData.OrderByDescending(s => s.EventEnqueuedUtcTime);
+                    ViewBag.DateSortParam = "date_asc";
+                    ViewBag.TempSortParam = "temp_asc";
+                    ViewBag.HumSortParam = "hum_asc";
+                    ViewBag.CO2SortParam = "co2_asc";
+                    break;
+                case "temp_asc":
+                    sensorData = sensorData.OrderBy(s => s.temperature);
+                    ViewBag.TempSortParam = "temp_desc";
+                    break;
+                case "temp_desc":
+                    sensorData = sensorData.OrderByDescending(s => s.temperature);
+                    ViewBag.TempSortParam = "temp_asc";
+                    break;
+                case "hum_asc":
+                    sensorData = sensorData.OrderBy(s => s.humidity);
+                    ViewBag.HumSortParam = "hum_desc";
+                    break;
+                case "hum_desc":
+                    sensorData = sensorData.OrderByDescending(s => s.humidity);
+                    ViewBag.HumSortParam = "hum_asc";
+                    break;
+                case "co2_asc":
+                    sensorData = sensorData.OrderBy(s => s.co2);
+                    ViewBag.CO2SortParam = "co2_desc";
+                    break;
+                case "co2_desc":
+                    sensorData = sensorData.OrderByDescending(s => s.co2);
+                    ViewBag.CO2SortParam = "co2_asc";
+                    break;
+                default:
+                    sensorData = sensorData.OrderByDescending(s => s.EventEnqueuedUtcTime);
+                    ViewBag.DateSortParam = "date_asc";
+                    ViewBag.TempSortParam = "temp_desc";
+                    ViewBag.HumSortParam = "hum_desc";
+                    ViewBag.CO2SortParam = "co2_desc";
+                    break;
+            }
+            int pageSize = 30;
+            int pageNumber = (page ?? 1);
+            return View(sensorData.ToPagedList(pageNumber,pageSize));
         }
+
 
         // GET: Sensor/Details/5
         public ActionResult Details(int? id)
@@ -34,87 +88,7 @@ namespace ClimateControl.Web.Controllers
             }
             return View(sensorData);
         }
-
-        // GET: Sensor/Create
-        //public ActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        // POST: Sensor/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create([Bind(Include = "Id,deviceId,temperature,humidity,co2,EventProcessedUtcTime,EventEnqueuedUtcTime")] SensorData sensorData)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.SensorData.Add(sensorData);
-        //        db.SaveChanges();
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    return View(sensorData);
-        //}
-
-        // GET: Sensor/Edit/5
-        //public ActionResult Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-        //    }
-        //    SensorData sensorData = db.SensorData.Find(id);
-        //    if (sensorData == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(sensorData);
-        //}
-
-        // POST: Sensor/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit([Bind(Include = "Id,deviceId,temperature,humidity,co2,EventProcessedUtcTime,EventEnqueuedUtcTime")] SensorData sensorData)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        db.Entry(sensorData).State = EntityState.Modified;
-        //        db.SaveChanges();
-        //        return RedirectToAction("Index");
-        //    }
-        //    return View(sensorData);
-        //}
-
-        // GET: Sensor/Delete/5
-        //public ActionResult Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-        //    }
-        //    SensorData sensorData = db.SensorData.Find(id);
-        //    if (sensorData == null)
-        //    {
-        //        return HttpNotFound();
-        //    }
-        //    return View(sensorData);
-        //}
-
-        // POST: Sensor/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult DeleteConfirmed(int id)
-        //{
-        //    SensorData sensorData = db.SensorData.Find(id);
-        //    db.SensorData.Remove(sensorData);
-        //    db.SaveChanges();
-        //    return RedirectToAction("Index");
-        //}
-
+        
         protected override void Dispose(bool disposing)
         {
             if (disposing)
