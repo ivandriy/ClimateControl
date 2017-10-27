@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using ClimateControl.Web.Models;
+using Microsoft.Practices.ObjectBuilder2;
 using PagedList;
 
 namespace ClimateControl.Web.Controllers
@@ -19,7 +21,7 @@ namespace ClimateControl.Web.Controllers
         {
             ViewBag.CurrentSort = sortOrder;
             var sensorData = from s in db.SensorData
-                             select s;
+                                select s;
             switch (sortOrder)
             {
                 case "date_asc":
@@ -69,8 +71,8 @@ namespace ClimateControl.Web.Controllers
                     break;
             }
             int pageSize = 30;
-            int pageNumber = (page ?? 1);
-            return View(sensorData.ToPagedList(pageNumber,pageSize));
+            int pageNumber = (page ?? 1);            
+            return View(sensorData.ToPagedList(pageNumber, pageSize));
         }
 
 
@@ -88,7 +90,28 @@ namespace ClimateControl.Web.Controllers
             }
             return View(sensorData);
         }
-        
+
+        public ActionResult TemperatureChart()
+        {
+            DateTime startDateTime = DateTime.Today.ToUniversalTime(); 
+            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+            var tempData = (from s in db.SensorData
+                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)                
+                select s);
+            var dates = (from t in tempData
+                select t.EventEnqueuedUtcTime).ToList();
+            var temperatures = (from t in tempData
+                select t.temperature).ToList();
+            
+            var datesStrings = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
+                CultureInfo.InvariantCulture)).ToList();
+            var datesArray = datesStrings.Select(str => $"\"{str}\"").ToList();
+
+            ViewBag.DatesList = string.Join(",", datesArray).Trim();
+            ViewBag.TemperaturesList = string.Join(",", temperatures).Trim();
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -6,6 +6,9 @@
     <h3>Climate Control web application</h3>
 </div>
 
-<div>
-    @Html.ActionLink("View sensor data", "Index", "Sensor")       
+<div> 
+    <ul>
+        <li>@Html.ActionLink("View sensor data", "Index", "Sensor")</li>
+        <li>@Html.ActionLink("Temperature chart", "TemperatureChart", "Sensor")</li> 
+    </ul>
 </div>
