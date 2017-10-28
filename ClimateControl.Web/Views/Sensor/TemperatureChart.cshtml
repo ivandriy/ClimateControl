@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Temperature Chart";
     Layout = null;
 }
@@ -10,11 +9,11 @@
     <meta name="viewport" content="width=device-width" />
     <title>Temperature Chart</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
-    <script>  
-        var dataSet =  
-        {  
-            labels: [@Html.Raw(ViewBag.DatesList)],  
-            datasets: [{ 
+    <script>
+        var dataSet =
+        {
+            labels: [@Html.Raw(ViewBag.DatesList)],
+            datasets: [{
                 fill: true,
                 label: 'Temperature, C',
                 yAxisID: 'Temperature',
@@ -23,16 +22,16 @@
                 backgroundColor: "rgba(255, 204, 0, 0.4)",
                 pointHoverBackgroundColor: "rgba(255, 204, 0, 1)",
                 pointHoverBorderColor: "rgba(255, 204, 0, 1)",
-                borderWidth: 2,  
-                data: [@ViewBag.TemperaturesList]  
-            }]  
+                borderWidth: 2,
+                data: [@ViewBag.TemperaturesList]
+            }]
         };
 
         var options = {
-            title:  
-            {  
-                display: true,  
-                text: "Temperature",
+            title:
+            {
+                display: true,
+                text: "@ViewBag.ChartRange",
                 fontSize: 36
             },
             scales: {
@@ -46,26 +45,45 @@
                     position: 'left',
                 }]
             },
-            responsive: true,  
-            maintainAspectRatio: true  
+            responsive: true,
+            maintainAspectRatio: true
         };
 
 
 
-        window.onload = function () {  
-            var ctx1 = document.getElementById("TemperatureChart").getContext("2d");  
-            window.myBar = new Chart(ctx1,  
-                {  
-                    type: 'line',  
-                    data: dataSet,  
-                    options: options 
-                });  
-        }  
+        window.onload = function () {
+            var ctx1 = document.getElementById("TemperatureChart").getContext("2d");
+            window.myBar = new Chart(ctx1,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+        }
+
+        var url = '@Url.Action("TemperatureChart", "Sensor")';
+        function CallChangefunc(val){
+            location.href = url + "?range=" + val;
+        }
     </script>  
 </head>
 <body>
-<div style="text-align: center">  
-    <canvas id="TemperatureChart"></canvas>  
+<br/>
+<h3>Select chart range</h3>
+<br/>
+@Html.DropDownList("ChartRange", new[] 
+{
+    new SelectListItem() { Text = "", Value = "", Selected = true},
+    new SelectListItem() { Text = "Day", Value = "day", },
+    new SelectListItem() { Text = "Week", Value = "week" },
+    new SelectListItem() { Text = "Month", Value = "month" }
+},
+    new { @onchange="CallChangefunc(this.value)" })
+<br/>
+<br/>
+
+<div style="text-align: center">
+    <canvas id="TemperatureChart"></canvas>
 </div>
 </body>
 </html>  

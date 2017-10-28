@@ -91,13 +91,49 @@ namespace ClimateControl.Web.Controllers
             return View(sensorData);
         }
 
-        public ActionResult TemperatureChart()
+        public ActionResult TemperatureChart(string range)
         {
-            DateTime startDateTime = DateTime.Today.ToUniversalTime(); 
-            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+            List<double> temperatures;
+            List<string> datesList;
+            GetTemperatures(range, out temperatures, out datesList);
+
+            ViewBag.DatesList = string.Join(",", datesList).Trim();
+            ViewBag.TemperaturesList = string.Join(",", temperatures).Trim();
+            ViewBag.ChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
+
+            return View();
+        }
+
+        private void GetTemperatures(string range, out List<double> temperatures, out List<string> datesList)
+        {
+            DateTime startDateTime;
+            DateTime endDateTime;
+            switch (range)
+            {
+                case "day":
+                    startDateTime = DateTime.Today.ToUniversalTime();
+                    endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    break;
+                case "week":
+                    startDateTime = DateTime.Today.AddDays(
+                            ((int) CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek + 1) -
+                            (int) DateTime.Today.DayOfWeek)
+                        .ToUniversalTime();
+                    endDateTime = startDateTime.AddDays(7).AddTicks(-1);
+                    break;
+                case "month":
+                    startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToUniversalTime();
+                    endDateTime = startDateTime.ToUniversalTime().AddMonths(1).AddDays(-1).AddTicks(-1);
+                    break;
+                default:
+                    startDateTime = DateTime.Today.ToUniversalTime();
+                    endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    break;
+            }
+
 
             var tempData = (from s in db.SensorData
-                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)                
+                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
                 select new
                 {
                     s.temperature,
@@ -106,16 +142,14 @@ namespace ClimateControl.Web.Controllers
 
             var dates = (from t in tempData
                 select t.EventEnqueuedUtcTime).ToList();
-            var temperatures = (from t in tempData
+            temperatures = (from t in tempData
                 select t.temperature).ToList();
-            
-            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
-                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
-            
-            ViewBag.DatesList = string.Join(",", datesList).Trim();
-            ViewBag.TemperaturesList = string.Join(",", temperatures).Trim();
 
-            return View();
+            datesList = dates.Select(d => d.ToLocalTime()
+                    .ToString("yyyy-MM-dd HH:mm",
+                        CultureInfo.InvariantCulture))
+                .Select(str => $"\"{str}\"")
+                .ToList();
         }
 
         public ActionResult HumidityChart()
