@@ -178,24 +178,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ClimateControlModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ClimateControlModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ClimateControlModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ClimateControlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ClimateControlModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ClimateControlModel.edmx</DependentUpon>
-    </Compile>
-    <Compile Include="Models\SensorData.cs">
-      <DependentUpon>ClimateControlModel.tt</DependentUpon>
-    </Compile>
+    <Compile Include="Models\ClimateControlEntities.cs" />
+    <Compile Include="Models\SensorData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -206,27 +190,10 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Models\ClimateControlModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ClimateControlModel.edmx</DependentUpon>
-      <LastGenOutput>ClimateControlModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\ClimateControlModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ClimateControlModel.edmx</DependentUpon>
-      <LastGenOutput>ClimateControlModel.cs</LastGenOutput>
-    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <EntityDeploy Include="Models\ClimateControlModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ClimateControlModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\ClimateControlModel.edmx.diagram">
-      <DependentUpon>ClimateControlModel.edmx</DependentUpon>
     </Content>
     <None Include="Properties\PublishProfiles\axisclimatecontrol - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
