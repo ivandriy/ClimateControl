@@ -145,6 +145,33 @@ namespace ClimateControl.Web.Controllers
             return View();
         }
 
+        public ActionResult Co2Chart()
+        {
+            DateTime startDateTime = DateTime.Today.ToUniversalTime();
+            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+
+            var tempData = (from s in db.SensorData
+                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
+                select new
+                {
+                    s.co2,
+                    s.EventEnqueuedUtcTime
+                });
+
+            var dates = (from t in tempData
+                select t.EventEnqueuedUtcTime).ToList();
+            var co2 = (from t in tempData
+                select t.co2).ToList();
+
+            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
+                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
+
+            ViewBag.DatesList = string.Join(",", datesList).Trim();
+            ViewBag.CO2List = string.Join(",", co2).Trim();
+
+            return View();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

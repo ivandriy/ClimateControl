@@ -1,0 +1,73 @@
+﻿
+@{
+    ViewBag.Title = "CO2 Chart";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>CO2 Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <script>
+
+        var dataSet =
+        {
+            labels: [@Html.Raw(ViewBag.DatesList)],
+            datasets: [{
+                fill: true,
+                label: 'CO2',
+                yAxisID: 'CO2',
+                borderColor: "rgba(170,0,120, 0.8)",
+                pointBoarderColor: "rgba(209,202,176, 0.8)",
+                backgroundColor: "rgba(24, 120, 240, 0.4)",
+                pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
+                pointHoverBorderColor: "rgba(24, 120, 240, 1)",
+                borderWidth: 2,
+                data: [@ViewBag.CO2List]
+            }]
+        };
+
+        var options = {
+            title:
+            {
+                display: true,
+                text: "CO2",
+                fontSize: 36
+            },
+            scales: {
+                yAxes: [{
+                    id: 'CO2',
+                    type: 'linear',
+                    scaleLabel: {
+                        labelString: 'CO2',
+                        display: true
+                    },
+                    position: 'left',
+                }]
+            },
+            responsive: true,
+            maintainAspectRatio: true
+        };
+
+
+
+        window.onload = function () {
+            var ctx1 = document.getElementById("CO2Chart").getContext("2d");
+            window.myBar = new Chart(ctx1,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+        }
+    </script>
+</head>
+<body>
+    <div style="text-align: center">
+        <canvas id="CO2Chart"></canvas>
+    </div>
+</body>
+</html>  
+
