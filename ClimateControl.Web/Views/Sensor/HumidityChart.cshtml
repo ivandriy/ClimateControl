@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "Humidity Chart";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Humidity Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <script>  
+        var dataSet =  
+        {  
+            labels: [@Html.Raw(ViewBag.DatesList)],  
+            datasets: [{ 
+                fill: true,
+                label: 'Humidity, %',
+                yAxisID: 'Humidity',
+                borderColor: "rgba(24, 120, 240, 1)",
+                pointBoarderColor: "rgba(24, 120, 240, 1)",
+                backgroundColor: "rgba(24, 120, 240, 0.4)",
+                pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
+                pointHoverBorderColor: "rgba(24, 120, 240, 1)",
+                borderWidth: 2,  
+                data: [@ViewBag.HumiditiesList]  
+            }]  
+        };
+
+        var options = {
+            title:  
+            {  
+                display: true,  
+                text: "Humidity",
+                fontSize: 36
+            },
+            scales: {
+                yAxes: [{
+                    id: 'Humidity',
+                    type: 'linear',
+                    scaleLabel: {
+                        labelString: 'Humidity, %',
+                        display: true
+                    },
+                    position: 'left',
+                }]
+            },
+            responsive: true,  
+            maintainAspectRatio: true  
+        };
+
+
+
+        window.onload = function () {  
+            var ctx1 = document.getElementById("HumidityChart").getContext("2d");  
+            window.myBar = new Chart(ctx1,  
+                {  
+                    type: 'line',  
+                    data: dataSet,  
+                    options: options 
+                });  
+        }  
+    </script>  
+</head>
+<body>
+<div style="text-align: center">  
+    <canvas id="HumidityChart"></canvas>  
+</div>
+</body>
+</html>  
+

@@ -224,6 +224,7 @@
     <Content Include="Views\Sensor\Details.cshtml" />
     <Content Include="Views\Sensor\Index.cshtml" />
     <Content Include="Views\Sensor\TemperatureChart.cshtml" />
+    <Content Include="Views\Sensor\HumidityChart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

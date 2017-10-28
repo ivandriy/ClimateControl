@@ -95,20 +95,53 @@ namespace ClimateControl.Web.Controllers
         {
             DateTime startDateTime = DateTime.Today.ToUniversalTime(); 
             DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+
             var tempData = (from s in db.SensorData
                 where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)                
-                select s);
+                select new
+                {
+                    s.temperature,
+                    s.EventEnqueuedUtcTime
+                });
+
             var dates = (from t in tempData
                 select t.EventEnqueuedUtcTime).ToList();
             var temperatures = (from t in tempData
                 select t.temperature).ToList();
             
-            var datesStrings = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
-                CultureInfo.InvariantCulture)).ToList();
-            var datesArray = datesStrings.Select(str => $"\"{str}\"").ToList();
-
-            ViewBag.DatesList = string.Join(",", datesArray).Trim();
+            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
+                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
+            
+            ViewBag.DatesList = string.Join(",", datesList).Trim();
             ViewBag.TemperaturesList = string.Join(",", temperatures).Trim();
+
+            return View();
+        }
+
+        public ActionResult HumidityChart()
+        {
+            DateTime startDateTime = DateTime.Today.ToUniversalTime();
+            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+
+            var tempData = (from s in db.SensorData
+                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
+                select new
+                {
+                    s.humidity,
+                    s.EventEnqueuedUtcTime
+                });
+
+            var dates = (from t in tempData
+                select t.EventEnqueuedUtcTime).ToList();
+            var humidities = (from t in tempData
+                select t.humidity).ToList();
+
+            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
+                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
+
+            ViewBag.DatesList = string.Join(",", datesList).Trim();
+            ViewBag.HumiditiesList = string.Join(",", humidities).Trim();
+
             return View();
         }
 
