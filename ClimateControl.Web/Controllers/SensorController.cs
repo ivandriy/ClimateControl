@@ -93,18 +93,34 @@ namespace ClimateControl.Web.Controllers
 
         public ActionResult TemperatureChart(string range)
         {
-            List<double> temperatures;
+            List<double> temperaturesList;
             List<string> datesList;
-            GetTemperatures(range, out temperatures, out datesList);
+            GetTemperatures(range, out temperaturesList, out datesList);
 
             ViewBag.DatesList = string.Join(",", datesList).Trim();
-            ViewBag.TemperaturesList = string.Join(",", temperatures).Trim();
+            ViewBag.TemperaturesList = string.Join(",", temperaturesList).Trim();
             ViewBag.ChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
 
             return View();
         }
 
-        private void GetTemperatures(string range, out List<double> temperatures, out List<string> datesList)
+        private void GetTemperatures(string range, out List<double> temperaturesList, out List<string> datesList)
+        {
+            var sensorData = GetSensorDataByRange(range);
+
+            var dates = (from t in sensorData
+                         select t.EventEnqueuedUtcTime).ToList();
+            temperaturesList = (from t in sensorData
+                            select t.temperature).ToList();
+
+            datesList = dates.Select(d => d.ToLocalTime()
+                    .ToString("yyyy-MM-dd HH:mm",
+                        CultureInfo.InvariantCulture))
+                .Select(str => $"\"{str}\"")
+                .ToList();
+        }
+
+        private IQueryable<SensorData> GetSensorDataByRange(string range)
         {
             DateTime startDateTime;
             DateTime endDateTime;
@@ -116,7 +132,7 @@ namespace ClimateControl.Web.Controllers
                     break;
                 case "week":
                     startDateTime = DateTime.Today.AddDays(
-                            ((int) CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek + 1) -
+                            ((int) CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
                             (int) DateTime.Today.DayOfWeek)
                         .ToUniversalTime();
                     endDateTime = startDateTime.AddDays(7).AddTicks(-1);
@@ -132,24 +148,11 @@ namespace ClimateControl.Web.Controllers
             }
 
 
-            var tempData = (from s in db.SensorData
+            var sensorData
+                = from s in db.SensorData
                 where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
-                select new
-                {
-                    s.temperature,
-                    s.EventEnqueuedUtcTime
-                });
-
-            var dates = (from t in tempData
-                select t.EventEnqueuedUtcTime).ToList();
-            temperatures = (from t in tempData
-                select t.temperature).ToList();
-
-            datesList = dates.Select(d => d.ToLocalTime()
-                    .ToString("yyyy-MM-dd HH:mm",
-                        CultureInfo.InvariantCulture))
-                .Select(str => $"\"{str}\"")
-                .ToList();
+                select s;
+            return sensorData;
         }
 
         public ActionResult HumidityChart()
