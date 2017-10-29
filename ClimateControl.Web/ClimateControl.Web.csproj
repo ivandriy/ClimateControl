@@ -216,7 +216,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="IoTHub\MessageProcessor.cs" />
     <Compile Include="Models\ClimateControlEntities.cs" />
     <Compile Include="Models\SensorData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
