@@ -184,31 +184,32 @@ namespace ClimateControl.Web.Controllers
                 .ToList();
         }
 
-        public ActionResult Co2Chart()
+        public ActionResult Co2Chart(string range)
         {
-            DateTime startDateTime = DateTime.Today.ToUniversalTime();
-            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
-
-            var tempData = (from s in db.SensorData
-                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
-                select new
-                {
-                    s.co2,
-                    s.EventEnqueuedUtcTime
-                });
-
-            var dates = (from t in tempData
-                select t.EventEnqueuedUtcTime).ToList();
-            var co2 = (from t in tempData
-                select t.co2).ToList();
-
-            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
-                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
+            List<double> co2List;
+            List<string> datesList;
+            GetCo2(range, out co2List, out datesList);
 
             ViewBag.DatesList = string.Join(",", datesList).Trim();
-            ViewBag.CO2List = string.Join(",", co2).Trim();
+            ViewBag.CO2List = string.Join(",", co2List).Trim();
+            ViewBag.CO2ChartRange = string.IsNullOrEmpty(range) ? "CO2 by day" : $"CO2 by {range}";
 
             return View();
+        }
+
+        private void GetCo2(string range, out List<double> co2List, out List<string> datesList)
+        {
+            var sensorData = GetSensorDataByRange(range);
+            var dates = (from t in sensorData
+                select t.EventEnqueuedUtcTime).ToList();
+            co2List = (from t in sensorData
+                select t.co2).ToList();
+
+            datesList = dates.Select(d => d.ToLocalTime()
+                    .ToString("yyyy-MM-dd HH:mm",
+                        CultureInfo.InvariantCulture))
+                .Select(str => $"\"{str}\"")
+                .ToList();
         }
 
         protected override void Dispose(bool disposing)

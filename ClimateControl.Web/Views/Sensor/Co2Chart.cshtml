@@ -9,6 +9,8 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>CO2 Chart</title>
+    <link href="/Content/bootstrap.css" rel="stylesheet"/>
+    <link href="/Content/site.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
     <script>
 
@@ -33,7 +35,7 @@
             title:
             {
                 display: true,
-                text: "CO2",
+                text: "@ViewBag.CO2ChartRange",
                 fontSize: 36
             },
             scales: {
@@ -62,12 +64,34 @@
                     options: options
                 });
         }
+        var url = '@Url.Action("Co2Chart", "Sensor")';
+        function CallChangefunc(val){
+            location.href = url + "?range=" + val;
+        }
     </script>
 </head>
 <body>
-    <div style="text-align: center">
-        <canvas id="CO2Chart"></canvas>
-    </div>
+    <table>
+        <tr>
+            <td>
+                <h4 class="text-primary">Select chart range</h4>
+            </td>
+            <td>
+                @Html.DropDownList("ChartRange", new[]
+            {
+                new SelectListItem() {Text = "", Value = "", Selected = true},
+                new SelectListItem() {Text = "Day", Value = "day",},
+                new SelectListItem() {Text = "Week", Value = "week"},
+                new SelectListItem() {Text = "Month", Value = "month"}
+            },
+                new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })
+            </td>
+        </tr>
+    </table>
+    <br />
+<div style="text-align: center">
+    <canvas id="CO2Chart"></canvas>
+</div>
 </body>
 </html>  
 
