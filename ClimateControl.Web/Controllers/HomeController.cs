@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ClimateControl.Web.Models;
 
 namespace ClimateControl.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private ClimateControlEntities db = new ClimateControlEntities();
         public ActionResult Index()
         {
-            return View();
+            var latestSensorData = (from s in db.SensorData
+                                   orderby s.EventEnqueuedUtcTime descending 
+                                select s).Take(1).SingleOrDefault();
+                        
+            return View(latestSensorData);
         }
 
         public ActionResult About()

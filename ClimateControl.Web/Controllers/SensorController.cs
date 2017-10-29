@@ -15,7 +15,7 @@ namespace ClimateControl.Web.Controllers
 {
     public class SensorController : Controller
     {
-        private ClimateControlEntities db = new ClimateControlEntities();
+        private ClimateControlEntities db = new ClimateControlEntities();        
 
         public ActionResult Index(string sortOrder, int? page)
         {
