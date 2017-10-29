@@ -4,14 +4,27 @@
 }
 
 <div>
-    <h3>Climate Monitor Dashboard</h3>
-    <br/>
-    <h4 class="text-success">Current values: (last updated at @Model.EventEnqueuedUtcTime)</h4>
-    <ul>
-        <li>Temperature: @Model.temperature C</li>
-        <li>Humidity: @Model.humidity %</li>
-        <li>CO2: @Model.co2</li>
-    </ul>
+    <h3>Climate Monitor Dashboard</h3>        
+    <div class="pull-right">
+        <div class="well">
+            <table>
+                <tr>
+                    <td>
+                        <img src="~/images/climate.png" class="img-rounded" height="125" width="125" />
+                    </td>
+                    <td>
+                        <h3 class="text-success" align="center">Climate now:</h3>
+                        <ul>
+                            <li>Temperature: @Model.temperature C</li>
+                            <li>Humidity: @Model.humidity %</li>
+                            <li>CO2: @Model.co2</li>
+                            <li>Updated: @Model.EventEnqueuedUtcTime</li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <br/>
     <h4>View details</h4>
     <ul>

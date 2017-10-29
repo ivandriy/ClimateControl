@@ -1,6 +1,5 @@
 ﻿@{
     ViewBag.Title = "Temperature Chart";
-    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -70,11 +69,15 @@
     </script>  
 </head>
 <body>
+<br/>
+<br/>
 <table>
     <tr>
         <td>
             <h4 class="text-primary">Select chart range</h4>
         </td>
+    </tr>
+    <tr>
         <td>
             @Html.DropDownList("ChartRange", new[]
             {
@@ -83,8 +86,8 @@
                 new SelectListItem() {Text = "Week", Value = "week"},
                 new SelectListItem() {Text = "Month", Value = "month"}
             },
-                new {@onchange = "CallChangefunc(this.value)", @class = "form-control"})
-        </td>        
+                new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })
+        </td>
     </tr>
 </table>
 <br/>

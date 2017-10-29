@@ -1,7 +1,6 @@
 ﻿
 @{
     ViewBag.Title = "Humidity Chart";
-    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -70,11 +69,15 @@
     </script>  
 </head>
 <body>
-<table>
+    <br />
+    <br />
+    <table>
         <tr>
             <td>
                 <h4 class="text-primary">Select chart range</h4>
             </td>
+        </tr>
+        <tr>
             <td>
                 @Html.DropDownList("ChartRange", new[]
             {
@@ -86,7 +89,7 @@
                 new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })
             </td>
         </tr>
-</table>
+    </table>
 <br />
 <div style="text-align: center">
     <canvas id="HumidityChart"></canvas>
