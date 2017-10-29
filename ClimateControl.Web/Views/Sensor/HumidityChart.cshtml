@@ -9,12 +9,14 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Humidity Chart</title>
+    <link href="/Content/bootstrap.css" rel="stylesheet"/>
+    <link href="/Content/site.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
-    <script>  
-        var dataSet =  
-        {  
-            labels: [@Html.Raw(ViewBag.DatesList)],  
-            datasets: [{ 
+    <script>
+        var dataSet =
+        {
+            labels: [@Html.Raw(ViewBag.DatesList)],
+            datasets: [{
                 fill: true,
                 label: 'Humidity, %',
                 yAxisID: 'Humidity',
@@ -23,16 +25,16 @@
                 backgroundColor: "rgba(24, 120, 240, 0.4)",
                 pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
                 pointHoverBorderColor: "rgba(24, 120, 240, 1)",
-                borderWidth: 2,  
-                data: [@ViewBag.HumiditiesList]  
-            }]  
+                borderWidth: 2,
+                data: [@ViewBag.HumiditiesList]
+            }]
         };
 
         var options = {
-            title:  
-            {  
-                display: true,  
-                text: "Humidity",
+            title:
+            {
+                display: true,
+                text: "@ViewBag.HumChartRange",
                 fontSize: 36
             },
             scales: {
@@ -46,26 +48,48 @@
                     position: 'left',
                 }]
             },
-            responsive: true,  
-            maintainAspectRatio: true  
+            responsive: true,
+            maintainAspectRatio: true
         };
 
 
 
-        window.onload = function () {  
-            var ctx1 = document.getElementById("HumidityChart").getContext("2d");  
-            window.myBar = new Chart(ctx1,  
-                {  
-                    type: 'line',  
-                    data: dataSet,  
-                    options: options 
-                });  
-        }  
+        window.onload = function () {
+            var ctx1 = document.getElementById("HumidityChart").getContext("2d");
+            window.myBar = new Chart(ctx1,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+        }
+        var url = '@Url.Action("HumidityChart", "Sensor")';
+        function CallChangefunc(val){
+            location.href = url + "?range=" + val;
+        }
     </script>  
 </head>
 <body>
-<div style="text-align: center">  
-    <canvas id="HumidityChart"></canvas>  
+<table>
+        <tr>
+            <td>
+                <h4 class="text-primary">Select chart range</h4>
+            </td>
+            <td>
+                @Html.DropDownList("ChartRange", new[]
+            {
+                new SelectListItem() {Text = "", Value = "", Selected = true},
+                new SelectListItem() {Text = "Day", Value = "day",},
+                new SelectListItem() {Text = "Week", Value = "week"},
+                new SelectListItem() {Text = "Month", Value = "month"}
+            },
+                new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })
+            </td>
+        </tr>
+</table>
+<br />
+<div style="text-align: center">
+    <canvas id="HumidityChart"></canvas>
 </div>
 </body>
 </html>  

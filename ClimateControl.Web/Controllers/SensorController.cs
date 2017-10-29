@@ -99,7 +99,7 @@ namespace ClimateControl.Web.Controllers
 
             ViewBag.DatesList = string.Join(",", datesList).Trim();
             ViewBag.TemperaturesList = string.Join(",", temperaturesList).Trim();
-            ViewBag.ChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
+            ViewBag.TempChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
 
             return View();
         }
@@ -155,31 +155,33 @@ namespace ClimateControl.Web.Controllers
             return sensorData;
         }
 
-        public ActionResult HumidityChart()
+        public ActionResult HumidityChart(string range)
         {
-            DateTime startDateTime = DateTime.Today.ToUniversalTime();
-            DateTime endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
-
-            var tempData = (from s in db.SensorData
-                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
-                select new
-                {
-                    s.humidity,
-                    s.EventEnqueuedUtcTime
-                });
-
-            var dates = (from t in tempData
-                select t.EventEnqueuedUtcTime).ToList();
-            var humidities = (from t in tempData
-                select t.humidity).ToList();
-
-            var datesList = dates.Select(d => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm",
-                CultureInfo.InvariantCulture)).Select(str => $"\"{str}\"").ToList();
+            List<double> humiditiesList;
+            List<string> datesList;
+            GetHumidities(range, out humiditiesList, out datesList);
 
             ViewBag.DatesList = string.Join(",", datesList).Trim();
-            ViewBag.HumiditiesList = string.Join(",", humidities).Trim();
+            ViewBag.HumiditiesList = string.Join(",", humiditiesList).Trim();
+            ViewBag.HumChartRange = string.IsNullOrEmpty(range) ? "Humidity by day" : $"Humidity by {range}";
 
             return View();
+        }
+
+        private void GetHumidities(string range, out List<double> humiditiesList, out List<string> datesList)
+        {
+            var sensorData = GetSensorDataByRange(range);
+
+            var dates = (from t in sensorData
+                select t.EventEnqueuedUtcTime).ToList();
+            humiditiesList = (from t in sensorData
+                select t.humidity).ToList();
+
+            datesList = dates.Select(d => d.ToLocalTime()
+                    .ToString("yyyy-MM-dd HH:mm",
+                        CultureInfo.InvariantCulture))
+                .Select(str => $"\"{str}\"")
+                .ToList();
         }
 
         public ActionResult Co2Chart()
