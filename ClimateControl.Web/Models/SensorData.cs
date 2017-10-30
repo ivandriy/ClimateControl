@@ -14,7 +14,7 @@ namespace ClimateControl.Web.Models
         [Required]
         [StringLength(50)]
         public string deviceId { get; set; }
-        [DisplayFormat(DataFormatString = "{0:0.00}")]
+        [DisplayFormat(DataFormatString = "{0:0.0}")]
         public double temperature { get; set; }
         [DisplayFormat(DataFormatString = "{0:0.00}")]
         public double humidity { get; set; }
