@@ -25,14 +25,14 @@ namespace ClimateControl.Web.Controllers
             switch (sortOrder)
             {
                 case "date_asc":
-                    sensorData = sensorData.OrderBy(s => s.EventEnqueuedUtcTime);
+                    sensorData = sensorData.OrderBy(s => s.timestamp);
                     ViewBag.DateSortParam = "date_desc";
                     ViewBag.TempSortParam = "temp_desc";
                     ViewBag.HumSortParam = "hum_desc";
                     ViewBag.CO2SortParam = "co2_desc";
                     break;
                 case "date_desc":
-                    sensorData = sensorData.OrderByDescending(s => s.EventEnqueuedUtcTime);
+                    sensorData = sensorData.OrderByDescending(s => s.timestamp);
                     ViewBag.DateSortParam = "date_asc";
                     ViewBag.TempSortParam = "temp_asc";
                     ViewBag.HumSortParam = "hum_asc";
@@ -63,7 +63,7 @@ namespace ClimateControl.Web.Controllers
                     ViewBag.CO2SortParam = "co2_asc";
                     break;
                 default:
-                    sensorData = sensorData.OrderByDescending(s => s.EventEnqueuedUtcTime);
+                    sensorData = sensorData.OrderByDescending(s => s.timestamp);
                     ViewBag.DateSortParam = "date_asc";
                     ViewBag.TempSortParam = "temp_desc";
                     ViewBag.HumSortParam = "hum_desc";
@@ -109,7 +109,7 @@ namespace ClimateControl.Web.Controllers
             var sensorData = GetSensorDataByRange(range);
 
             var dates = (from t in sensorData
-                         select t.EventEnqueuedUtcTime).ToList();
+                         select t.timestamp).ToList();
             temperaturesList = (from t in sensorData
                             select t.temperature).ToList();
 
@@ -150,7 +150,7 @@ namespace ClimateControl.Web.Controllers
 
             var sensorData
                 = from s in db.SensorData
-                where (s.EventEnqueuedUtcTime >= startDateTime && s.EventEnqueuedUtcTime <= endDateTime)
+                where (s.timestamp >= startDateTime && s.timestamp <= endDateTime)
                 select s;
             return sensorData;
         }
@@ -173,7 +173,7 @@ namespace ClimateControl.Web.Controllers
             var sensorData = GetSensorDataByRange(range);
 
             var dates = (from t in sensorData
-                select t.EventEnqueuedUtcTime).ToList();
+                select t.timestamp).ToList();
             humiditiesList = (from t in sensorData
                 select t.humidity).ToList();
 
@@ -201,7 +201,7 @@ namespace ClimateControl.Web.Controllers
         {
             var sensorData = GetSensorDataByRange(range);
             var dates = (from t in sensorData
-                select t.EventEnqueuedUtcTime).ToList();
+                select t.timestamp).ToList();
             co2List = (from t in sensorData
                 select t.co2).ToList();
 

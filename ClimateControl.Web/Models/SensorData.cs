@@ -21,8 +21,6 @@ namespace ClimateControl.Web.Models
 
         public double co2 { get; set; }
 
-        public DateTime EventProcessedUtcTime { get; set; }
-
-        public DateTime EventEnqueuedUtcTime { get; set; }
+        public DateTime timestamp { get; set; }
     }
 }

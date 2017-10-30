@@ -13,7 +13,7 @@ namespace ClimateControl.Web.Controllers
         public ActionResult Index()
         {
             var latestSensorData = (from s in db.SensorData
-                                   orderby s.EventEnqueuedUtcTime descending 
+                                   orderby s.timestamp descending 
                                 select s).Take(1).SingleOrDefault();
                         
             return View(latestSensorData);
