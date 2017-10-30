@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ClimateControl.Web.Helpers;
 using ClimateControl.Web.Models;
 
 namespace ClimateControl.Web.Controllers
@@ -12,10 +13,14 @@ namespace ClimateControl.Web.Controllers
         private ClimateControlEntities db = new ClimateControlEntities();
         public ActionResult Index()
         {
-            var latestSensorData = (from s in db.SensorData
+            SensorData latestSensorData;
+            latestSensorData = (from s in db.SensorData
                                    orderby s.timestamp descending 
                                 select s).Take(1).SingleOrDefault();
-                        
+            if (latestSensorData != null)
+            {                
+                latestSensorData.timestamp = TimeZoneConverter.Convert(latestSensorData.timestamp);                
+            }
             return View(latestSensorData);
         }
 

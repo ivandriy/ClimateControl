@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using ClimateControl.Web.Helpers;
 using ClimateControl.Web.Models;
 using Microsoft.Practices.ObjectBuilder2;
 using PagedList;
@@ -72,6 +73,10 @@ namespace ClimateControl.Web.Controllers
             }
             int pageSize = 30;
             int pageNumber = (page ?? 1);            
+            foreach (SensorData data in sensorData)
+            {                
+                data.timestamp = TimeZoneConverter.Convert(data.timestamp);
+            }
             return View(sensorData.ToPagedList(pageNumber, pageSize));
         }
 
@@ -113,7 +118,7 @@ namespace ClimateControl.Web.Controllers
             temperaturesList = (from t in sensorData
                             select t.temperature).ToList();
 
-            datesList = dates.Select(d => d.ToLocalTime()
+            datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
                         CultureInfo.InvariantCulture))
                 .Select(str => $"\"{str}\"")
@@ -177,7 +182,7 @@ namespace ClimateControl.Web.Controllers
             humiditiesList = (from t in sensorData
                 select t.humidity).ToList();
 
-            datesList = dates.Select(d => d.ToLocalTime()
+            datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
                         CultureInfo.InvariantCulture))
                 .Select(str => $"\"{str}\"")
@@ -205,7 +210,7 @@ namespace ClimateControl.Web.Controllers
             co2List = (from t in sensorData
                 select t.co2).ToList();
 
-            datesList = dates.Select(d => d.ToLocalTime()
+            datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
                         CultureInfo.InvariantCulture))
                 .Select(str => $"\"{str}\"")

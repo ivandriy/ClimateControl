@@ -14,13 +14,13 @@ namespace ClimateControl.Web.Models
         [Required]
         [StringLength(50)]
         public string deviceId { get; set; }
-
+        [DisplayFormat(DataFormatString = "{0:0.0}")]
         public double temperature { get; set; }
-
+        [DisplayFormat(DataFormatString = "{0:0.0}")]
         public double humidity { get; set; }
 
         public double co2 { get; set; }
-
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm:ss}")]
         public DateTime timestamp { get; set; }
     }
 }

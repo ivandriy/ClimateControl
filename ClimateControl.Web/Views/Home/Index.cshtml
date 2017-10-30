@@ -15,10 +15,10 @@
                     <td>
                         <h3 class="text-success" align="center">Climate now:</h3>
                         <ul>
-                            <li>Temperature: @Model.temperature C</li>
-                            <li>Humidity: @Model.humidity %</li>
+                            <li>Temperature: @Html.DisplayFor(temp =>@Model.temperature) C</li>
+                            <li>Humidity: @Html.DisplayFor(hum => @Model.humidity) %</li>
                             <li>CO2: @Model.co2</li>
-                            <li>Updated: @Model.timestamp</li>
+                            <li>Updated: @Html.DisplayFor(timestamp => @Model.timestamp)</li>
                         </ul>
                     </td>
                 </tr>
