@@ -127,13 +127,26 @@ namespace ClimateControl.Web.Controllers
 
         private IQueryable<SensorData> GetSensorDataByRange(string range)
         {
+            
+            var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            var fleOffset = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time").BaseUtcOffset;
+
             DateTime startDateTime;
             DateTime endDateTime;
+
             switch (range)
             {
                 case "day":
-                    startDateTime = DateTime.Today.ToUniversalTime();
-                    endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.ToUniversalTime();
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
                     break;
                 case "week":
                     startDateTime = DateTime.Today.AddDays(
@@ -147,8 +160,16 @@ namespace ClimateControl.Web.Controllers
                     endDateTime = startDateTime.ToUniversalTime().AddMonths(1).AddDays(-1).AddTicks(-1);
                     break;
                 default:
-                    startDateTime = DateTime.Today.ToUniversalTime();
-                    endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.ToUniversalTime();
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
                     break;
             }
 
