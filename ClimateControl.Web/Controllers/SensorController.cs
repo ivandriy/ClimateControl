@@ -105,7 +105,7 @@ namespace ClimateControl.Web.Controllers
             ViewBag.DatesList = string.Join(",", datesList).Trim();
             ViewBag.TemperaturesList = string.Join(",", temperaturesList).Trim();
             ViewBag.TempChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
-
+            ViewBag.AvgTemperature = temperaturesList.Average().ToString("F");
             return View();
         }
 
@@ -190,6 +190,7 @@ namespace ClimateControl.Web.Controllers
             ViewBag.DatesList = string.Join(",", datesList).Trim();
             ViewBag.HumiditiesList = string.Join(",", humiditiesList).Trim();
             ViewBag.HumChartRange = string.IsNullOrEmpty(range) ? "Humidity by day" : $"Humidity by {range}";
+            ViewBag.AvgHumidity = humiditiesList.Average().ToString("F");
 
             return View();
         }
@@ -219,7 +220,7 @@ namespace ClimateControl.Web.Controllers
             ViewBag.DatesList = string.Join(",", datesList).Trim();
             ViewBag.CO2List = string.Join(",", co2List).Trim();
             ViewBag.CO2ChartRange = string.IsNullOrEmpty(range) ? "CO2 by day" : $"CO2 by {range}";
-
+            ViewBag.AvgCO2 = co2List.Average().ToString("F");
             return View();
         }
 
