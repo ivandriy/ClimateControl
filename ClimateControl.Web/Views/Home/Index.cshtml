@@ -2,28 +2,20 @@
 @{
     ViewBag.Title = "Home Page";
 }
-
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Home Page</title>
+    <script type="text/javascript">
+        setInterval("$('#climatenow').load('Home/ClimateNow')",30000);
+    </script>
+</head>
+<body>
 <div>
-    <h3>Climate Monitor Dashboard</h3>        
-    <div class="pull-right">
-        <div class="well">
-            <table>
-                <tr>
-                    <td>
-                        <img src="~/images/climate.png" class="img-rounded" height="125" width="125" />
-                    </td>
-                    <td>
-                        <h3 class="text-success" align="center">Climate now:</h3>
-                        <ul>
-                            <li>Temperature: @Html.DisplayFor(temp =>@Model.temperature) C</li>
-                            <li>Humidity: @Html.DisplayFor(hum => @Model.humidity) %</li>
-                            <li>CO2: @Model.co2</li>
-                            <li>Updated: @Html.DisplayFor(timestamp => @Model.timestamp)</li>
-                        </ul>
-                    </td>
-                </tr>
-            </table>
-        </div>
+    <h3>Climate Monitor Dashboard</h3>
+    <div id="climatenow">
+        @Html.Partial("ClimateNow",@Model)
     </div>
     <br/>
     <h4>View details</h4>
@@ -36,7 +28,7 @@
     <br/>
     <h4>Technologies used:</h4>
     <ul class="list-group-item-text">
-        <li><a href="https://www.raspberrypi.org/">Raspberry PI</a></li>        
+        <li><a href="https://www.raspberrypi.org/">Raspberry PI</a></li>
         <li> <a href="https://www.google.com.ua/search?q=mh-z19+sensor&oq=MH-Z19">CO2 sensor - MH-Z19</a></li>
         <li> <a href="https://www.google.com.ua/search?q=DHT22+sensor&oq=DHT22">Temperature & humidity sensor - DHT22</a></li>
         <li><a href="https://github.com/azure/azure-iot-sdk-python">Azure IoT Hub SDK</a> </li>
@@ -48,5 +40,6 @@
 <br/>
 <br/>
 <div>
-    
 </div>
+</body>
+</html>

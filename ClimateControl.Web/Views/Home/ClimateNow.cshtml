@@ -1,0 +1,22 @@
+﻿@model ClimateControl.Web.Models.SensorData
+<div class="pull-right">
+    <div class="well">
+        <table>
+            <tr>
+                <td>
+                    <img src="~/images/climate.png" class="img-rounded" height="125" width="125" />
+                </td>
+                <td>
+                    <h3 class="text-success" align="center">Climate now:</h3>
+                    <ul>
+                        <li>Temperature: @Html.DisplayFor(temp =>@Model.temperature) C</li>
+                        <li>Humidity: @Html.DisplayFor(hum => @Model.humidity) %</li>
+                        <li>CO2: @Model.co2</li>
+                        <li>Time: @Html.DisplayFor(timestamp => @Model.timestamp)</li>
+                        <li>Updated: @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</li>
+                    </ul>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

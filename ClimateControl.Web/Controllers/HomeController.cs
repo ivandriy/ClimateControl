@@ -13,29 +13,30 @@ namespace ClimateControl.Web.Controllers
         private ClimateControlEntities db = new ClimateControlEntities();
         public ActionResult Index()
         {
-            SensorData latestSensorData;
-            latestSensorData = (from s in db.SensorData
-                                   orderby s.timestamp descending 
-                                select s).Take(1).SingleOrDefault();
-            if (latestSensorData != null)
-            {                
-                latestSensorData.timestamp = TimeZoneConverter.Convert(latestSensorData.timestamp);                
-            }
+            var latestSensorData = GetLatestSensorData();
             return View(latestSensorData);
         }
 
-        public ActionResult About()
+        private SensorData GetLatestSensorData()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            SensorData latestSensorData;
+            latestSensorData = (from s in db.SensorData
+                    orderby s.timestamp descending
+                    select s).Take(1)
+                .SingleOrDefault();
+            if (latestSensorData != null)
+            {
+                latestSensorData.timestamp = TimeZoneConverter.Convert(latestSensorData.timestamp);
+            }
+            return latestSensorData;
         }
 
-        public ActionResult Contact()
+        [OutputCache(NoStore = true, Location = System.Web.UI.OutputCacheLocation.Client, Duration = 30)]
+        public ActionResult ClimateNow()
         {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            var latestSensorData = GetLatestSensorData();
+            return PartialView("ClimateNow",latestSensorData);
         }
+        
     }
 }
