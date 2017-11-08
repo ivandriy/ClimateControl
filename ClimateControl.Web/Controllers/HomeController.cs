@@ -37,6 +37,10 @@ namespace ClimateControl.Web.Controllers
             var latestSensorData = GetLatestSensorData();
             return PartialView("ClimateNow",latestSensorData);
         }
-        
+
+        public ActionResult About()
+        {            
+            return View();
+        }
     }
 }
