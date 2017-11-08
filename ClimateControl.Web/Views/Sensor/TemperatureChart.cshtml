@@ -82,8 +82,11 @@
             @Html.DropDownList("ChartRange", new[]
             {
                 new SelectListItem() {Text = "", Value = "", Selected = true},
+                new SelectListItem() {Text = "24 Hours", Value = "24 hours",},
                 new SelectListItem() {Text = "Day", Value = "day",},
+                new SelectListItem() {Text = "7 days", Value = "7 days",},
                 new SelectListItem() {Text = "Week", Value = "week"},
+                new SelectListItem() {Text = "30 days", Value = "30 days",},
                 new SelectListItem() {Text = "Month", Value = "month"}
             },
                 new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })

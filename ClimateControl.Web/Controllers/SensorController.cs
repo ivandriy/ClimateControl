@@ -127,16 +127,18 @@ namespace ClimateControl.Web.Controllers
 
         private IQueryable<SensorData> GetSensorDataByRange(string range)
         {
-            
+            //Time zone difference between local time and UTC
             var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            //Time zone difference between FLE time (Kiev zone) and UTC
             var fleOffset = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time").BaseUtcOffset;
 
             DateTime startDateTime;
             DateTime endDateTime;
 
+
             switch (range)
             {
-                case "day":
+                case "day":                    
                     if (utcOffset.Hours < 0)
                     {
                         startDateTime = DateTime.Today.ToUniversalTime();
@@ -148,12 +150,35 @@ namespace ClimateControl.Web.Controllers
                         endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
                     }
                     break;
+                case "24 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-24);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+                case "7 days":
+                    startDateTime = DateTime.UtcNow.AddDays(-7);
+                    endDateTime = DateTime.UtcNow;
+                    break;
                 case "week":
-                    startDateTime = DateTime.Today.AddDays(
-                            ((int) CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
-                            (int) DateTime.Today.DayOfWeek)
-                        .ToUniversalTime();
-                    endDateTime = startDateTime.AddDays(7).AddTicks(-1);
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.AddDays(
+                                ((int) CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
+                                (int) DateTime.Today.DayOfWeek)
+                            .ToUniversalTime();
+                        endDateTime = startDateTime.AddDays(7).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddDays(
+                                ((int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
+                                (int)DateTime.Today.DayOfWeek)
+                            .ToUniversalTime().AddHours(-fleOffset.Hours);
+                        endDateTime = startDateTime.AddDays(7).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
+                    break;
+                case "30 days":
+                    startDateTime = DateTime.UtcNow.AddDays(-30);
+                    endDateTime = DateTime.UtcNow;
                     break;
                 case "month":
                     startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToUniversalTime();
