@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ClimateControl.AzureDb;
+using ClimateControl.Data.Entities;
+using ClimateControl.Web.Helpers;
+using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ClimateControl.Web.Helpers;
 using Telegram.Bot;
 using Telegram.Bot.Args;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.InputMessageContents;
 using Telegram.Bot.Types.ReplyMarkups;
-using ClimateControl.Web.Models;
+
 
 namespace ClimateControl.Bot
 {
     class Program
     {
+        private static string botKey = ConfigurationManager.AppSettings["TelegramBotKey"];
         private static readonly TelegramBotClient Bot =
-            new TelegramBotClient("458066998:AAGUGIVMC_e8cfMBwS2Pa3SNde0ahrB60OQ");
-
-        private static ClimateControlEntities db = new ClimateControlEntities();
+            new TelegramBotClient(botKey);
+        private static AzureDbRepository repository = new AzureDbRepository();
 
         static void Main(string[] args)
         {
@@ -47,15 +44,15 @@ namespace ClimateControl.Bot
             Console.WriteLine($"Received message: {message.Text}\nFrom: {message.From.Username}");
             if (message.Text.StartsWith("/get_climate"))
             {
-                SensorData latestSensorData;
-                latestSensorData = (from s in db.SensorData
-                        orderby s.timestamp descending
-                        select s).Take(1)
-                    .SingleOrDefault();
+                Sensor latestSensorData;
+                latestSensorData = repository.GetSensorData()
+                    .OrderByDescending(d => d.Timestamp)
+                    .Take(1)
+                    .SingleOrDefault();                    
                 if (latestSensorData != null)
                 {
                     var reply =
-                        $"Temperature: {latestSensorData.temperature:0.0}C\nHumidity: {latestSensorData.humidity:0.00}%\nCO2: {latestSensorData.co2}\nLast updated: {TimeZoneConverter.Convert(latestSensorData.timestamp)}";
+                        $"Temperature: {latestSensorData.Temperature:0.0}C\nHumidity: {latestSensorData.Humidity:0.00}%\nCO2: {latestSensorData.CO2}\nLast updated: {TimeZoneConverter.Convert(latestSensorData.Timestamp)}";
                     Console.WriteLine($"Sending response: {reply}");
                     await Bot.SendTextMessageAsync(message.Chat.Id, reply);
                 }

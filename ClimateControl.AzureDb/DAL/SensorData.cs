@@ -1,4 +1,4 @@
-namespace ClimateControl.Web.Models
+namespace ClimateControl.AzureDb.DAL
 {
     using System;
     using System.Collections.Generic;
@@ -13,14 +13,10 @@ namespace ClimateControl.Web.Models
 
         [Required]
         [StringLength(50)]
-        public string deviceId { get; set; }
-        [DisplayFormat(DataFormatString = "{0:0.0}")]
-        public double temperature { get; set; }
-        [DisplayFormat(DataFormatString = "{0:0.00}")]
+        public string deviceId { get; set; }        
+        public double temperature { get; set; }        
         public double humidity { get; set; }
-
-        public double co2 { get; set; }
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm:ss}")]
+        public double co2 { get; set; }        
         public DateTime timestamp { get; set; }
     }
 }

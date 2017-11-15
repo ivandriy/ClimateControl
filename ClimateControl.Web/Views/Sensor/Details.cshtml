@@ -1,4 +1,4 @@
-﻿@model ClimateControl.Web.Models.SensorData
+﻿@model ClimateControl.Data.Entities.Sensor
 
 @{
     ViewBag.Title = "Details";
@@ -11,43 +11,43 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.deviceId)
+            @Html.DisplayNameFor(model => model.DeviceId)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.deviceId)
+            @Html.DisplayFor(model => model.DeviceId)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.temperature)
+            @Html.DisplayNameFor(model => model.Temperature)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.temperature)
+            @Html.DisplayFor(model => model.Temperature)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.humidity)
+            @Html.DisplayNameFor(model => model.Humidity)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.humidity)
+            @Html.DisplayFor(model => model.Humidity)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.co2)
+            @Html.DisplayNameFor(model => model.CO2)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.co2)
+            @Html.DisplayFor(model => model.CO2)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.timestamp)
+            @Html.DisplayNameFor(model => model.Timestamp)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.timestamp)
+            @Html.DisplayFor(model => model.Timestamp)
         </dd>
 
     </dl>

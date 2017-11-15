@@ -1,5 +1,4 @@
 ﻿using ClimateControl.Web.Helpers;
-using ClimateControl.Web.Models;
 using PagedList;
 using System;
 using System.Collections.Generic;
@@ -8,59 +7,65 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using ClimateControl.Data.Entities;
 
 namespace ClimateControl.Web.Controllers
 {
     public class SensorController : Controller
     {
-        private ClimateControlEntities db = new ClimateControlEntities();        
+        private readonly ISensorDataRepository repository;
+
+        public SensorController(ISensorDataRepository repository)
+        {
+            this.repository = repository;
+        }
 
         public ActionResult Index(string sortOrder, int? page)
         {
             ViewBag.CurrentSort = sortOrder;
-            var sensorData = GetSensorData();
+            var sensorData = repository.GetSensorData();
             switch (sortOrder)
             {
                 case "date_asc":
-                    sensorData = sensorData.OrderBy(s => s.timestamp);
+                    sensorData = sensorData.OrderBy(s => s.Timestamp);
                     ViewBag.DateSortParam = "date_desc";
                     ViewBag.TempSortParam = "temp_desc";
                     ViewBag.HumSortParam = "hum_desc";
                     ViewBag.CO2SortParam = "co2_desc";
                     break;
                 case "date_desc":
-                    sensorData = sensorData.OrderByDescending(s => s.timestamp);
+                    sensorData = sensorData.OrderByDescending(s => s.Timestamp);
                     ViewBag.DateSortParam = "date_asc";
                     ViewBag.TempSortParam = "temp_asc";
                     ViewBag.HumSortParam = "hum_asc";
                     ViewBag.CO2SortParam = "co2_asc";
                     break;
                 case "temp_asc":
-                    sensorData = sensorData.OrderBy(s => s.temperature);
+                    sensorData = sensorData.OrderBy(s => s.Temperature);
                     ViewBag.TempSortParam = "temp_desc";
                     break;
                 case "temp_desc":
-                    sensorData = sensorData.OrderByDescending(s => s.temperature);
+                    sensorData = sensorData.OrderByDescending(s => s.Temperature);
                     ViewBag.TempSortParam = "temp_asc";
                     break;
                 case "hum_asc":
-                    sensorData = sensorData.OrderBy(s => s.humidity);
+                    sensorData = sensorData.OrderBy(s => s.Humidity);
                     ViewBag.HumSortParam = "hum_desc";
                     break;
                 case "hum_desc":
-                    sensorData = sensorData.OrderByDescending(s => s.humidity);
+                    sensorData = sensorData.OrderByDescending(s => s.Humidity);
                     ViewBag.HumSortParam = "hum_asc";
                     break;
                 case "co2_asc":
-                    sensorData = sensorData.OrderBy(s => s.co2);
+                    sensorData = sensorData.OrderBy(s => s.CO2);
                     ViewBag.CO2SortParam = "co2_desc";
                     break;
                 case "co2_desc":
-                    sensorData = sensorData.OrderByDescending(s => s.co2);
+                    sensorData = sensorData.OrderByDescending(s => s.CO2);
                     ViewBag.CO2SortParam = "co2_asc";
                     break;
                 default:
-                    sensorData = sensorData.OrderByDescending(s => s.timestamp);
+                    sensorData = sensorData.OrderByDescending(s => s.Timestamp);
                     ViewBag.DateSortParam = "date_asc";
                     ViewBag.TempSortParam = "temp_desc";
                     ViewBag.HumSortParam = "hum_desc";
@@ -69,19 +74,12 @@ namespace ClimateControl.Web.Controllers
             }
             int pageSize = 30;
             int pageNumber = (page ?? 1);            
-            foreach (SensorData data in sensorData)
+            foreach (Sensor data in sensorData)
             {                
-                data.timestamp = TimeZoneConverter.Convert(data.timestamp);
+                data.Timestamp = TimeZoneConverter.Convert(data.Timestamp);
             }
             return View(sensorData.ToPagedList(pageNumber, pageSize));
-        }
-
-        
-        private IQueryable<SensorData> GetSensorData()
-        {
-            return from s in db.SensorData
-                select s;
-        }
+        }       
 
         public ActionResult Details(int? id)
         {
@@ -89,7 +87,7 @@ namespace ClimateControl.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            SensorData sensorData = db.SensorData.Find(id);
+            Sensor sensorData = repository.GetSensorData(id);
             if (sensorData == null)
             {
                 return HttpNotFound();
@@ -115,9 +113,9 @@ namespace ClimateControl.Web.Controllers
             var sensorData = GetSensorDataByRange(range);
 
             var dates = (from t in sensorData
-                         select t.timestamp).ToList();
+                         select t.Timestamp).ToList();
             temperaturesList = (from t in sensorData
-                            select t.temperature).ToList();
+                            select t.Temperature).ToList();
 
             datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
@@ -126,7 +124,7 @@ namespace ClimateControl.Web.Controllers
                 .ToList();
         }
 
-        private IQueryable<SensorData> GetSensorDataByRange(string range)
+        private IQueryable<Sensor> GetSensorDataByRange(string range)
         {
             //Time zone difference between local time and UTC
             var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
@@ -199,7 +197,7 @@ namespace ClimateControl.Web.Controllers
 
 
             var sensorData
-                = GetSensorData().Where(d => d.timestamp >= startDateTime && d.timestamp <= endDateTime);
+                = repository.GetSensorData().Where(d => d.Timestamp >= startDateTime && d.Timestamp <= endDateTime);
             return sensorData;
         }
 
@@ -222,9 +220,9 @@ namespace ClimateControl.Web.Controllers
             var sensorData = GetSensorDataByRange(range);
 
             var dates = (from t in sensorData
-                select t.timestamp).ToList();
+                select t.Timestamp).ToList();
             humiditiesList = (from t in sensorData
-                select t.humidity).ToList();
+                select t.Humidity).ToList();
 
             datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
@@ -250,9 +248,9 @@ namespace ClimateControl.Web.Controllers
         {
             var sensorData = GetSensorDataByRange(range);
             var dates = (from t in sensorData
-                select t.timestamp).ToList();
+                select t.Timestamp).ToList();
             co2List = (from t in sensorData
-                select t.co2).ToList();
+                select t.CO2).ToList();
 
             datesList = dates.Select(d => TimeZoneConverter.Convert(d)
                     .ToString("yyyy-MM-dd HH:mm",
@@ -265,7 +263,7 @@ namespace ClimateControl.Web.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                repository.Dispose();
             }
             base.Dispose(disposing);
         }

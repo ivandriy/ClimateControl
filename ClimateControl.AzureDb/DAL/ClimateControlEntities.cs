@@ -1,4 +1,4 @@
-namespace ClimateControl.Web.Models
+namespace ClimateControl.AzureDb.DAL
 {
     using System;
     using System.Data.Entity;

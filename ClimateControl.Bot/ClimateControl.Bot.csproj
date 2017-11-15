@@ -59,6 +59,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
@@ -87,12 +88,6 @@
     <None Include="Properties\webjob-publish-settings.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClimateControl.Web\ClimateControl.Web.csproj">
-      <Project>{57e82539-2aa9-4bae-9f57-7cbcf4492a2d}</Project>
-      <Name>ClimateControl.Web</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
@@ -103,6 +98,20 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClimateControl.AzureDb\ClimateControl.AzureDb.csproj">
+      <Project>{8640ebd9-f631-4d62-807c-1d6790cbe2c1}</Project>
+      <Name>ClimateControl.AzureDb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClimateControl.Data\ClimateControl.Data.csproj">
+      <Project>{D86C5704-6800-45BC-B385-1ED0E9E0068E}</Project>
+      <Name>ClimateControl.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClimateControl.Web\ClimateControl.Web.csproj">
+      <Project>{57E82539-2AA9-4BAE-9F57-7CBCF4492A2D}</Project>
+      <Name>ClimateControl.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.12\tools\webjobs.targets')" />

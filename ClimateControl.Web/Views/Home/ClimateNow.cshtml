@@ -1,8 +1,5 @@
 ﻿@using ClimateControl.Web.Helpers
-@model ClimateControl.Web.Models.SensorData
-    @{
-        var timenow = TimeZoneConverter.Convert(DateTime.UtcNow);
-    }
+@model ClimateControl.Data.Entities.Sensor   
 <div>
     <div>
         <table>
@@ -13,11 +10,10 @@
                 <td>
                     <h3 class="text-success" align="center">Climate now:</h3>
                     <ul>
-                        <li>Temperature: @Html.DisplayFor(temp =>@Model.temperature) C</li>
-                        <li>Humidity: @Html.DisplayFor(hum => @Model.humidity) %</li>
-                        <li>CO2: @Model.co2</li>
-                        <li>Time: @Html.DisplayFor(timestamp => @Model.timestamp)</li>
-                        <li>Updated:@timenow.ToString("dd/MM/yyyy HH:mm:ss")</li>
+                        <li>Temperature: @Html.DisplayFor(temp =>@Model.Temperature) C</li>
+                        <li>Humidity: @Html.DisplayFor(hum => @Model.Humidity) %</li>
+                        <li>CO2: @Model.CO2</li>
+                        <li>Updated: @Html.DisplayFor(timestamp => @Model.Timestamp)</li>                        
                     </ul>
                 </td>
             </tr>

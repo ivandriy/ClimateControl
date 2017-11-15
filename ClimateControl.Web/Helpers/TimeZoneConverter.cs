@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using ClimateControl.Web.Models;
 
 namespace ClimateControl.Web.Helpers
 {

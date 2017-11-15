@@ -1,13 +1,18 @@
 ﻿using ClimateControl.Web.Helpers;
-using ClimateControl.Web.Models;
 using System.Linq;
 using System.Web.Mvc;
+using ClimateControl.Data.Entities;
 
 namespace ClimateControl.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private ClimateControlEntities db = new ClimateControlEntities();
+        private readonly ISensorDataRepository repository;
+
+        public HomeController(ISensorDataRepository repository)
+        {
+            this.repository = repository;
+        }
 
         public ActionResult Index()
         {
@@ -15,16 +20,13 @@ namespace ClimateControl.Web.Controllers
             return View(latestSensorData);
         }
 
-        private SensorData GetLatestSensorData()
+        private Sensor GetLatestSensorData()
         {
-            SensorData latestSensorData;
-            latestSensorData = (from s in db.SensorData
-                    orderby s.timestamp descending
-                    select s).Take(1)
-                .SingleOrDefault();
+            Sensor latestSensorData;
+            latestSensorData = repository.GetSensorData().OrderByDescending(d => d.Timestamp).Take(1).SingleOrDefault();
             if (latestSensorData != null)
             {
-                latestSensorData.timestamp = TimeZoneConverter.Convert(latestSensorData.timestamp);
+                latestSensorData.Timestamp = TimeZoneConverter.Convert(latestSensorData.Timestamp);
             }
             return latestSensorData;
         }
