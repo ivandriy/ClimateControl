@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using ClimateControl.Web.Helpers;
+﻿using ClimateControl.Web.Helpers;
 using ClimateControl.Web.Models;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace ClimateControl.Web.Controllers
 {
     public class HomeController : Controller
     {
         private ClimateControlEntities db = new ClimateControlEntities();
+
         public ActionResult Index()
         {
             var latestSensorData = GetLatestSensorData();

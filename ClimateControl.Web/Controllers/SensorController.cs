@@ -1,16 +1,13 @@
-﻿using System;
+﻿using ClimateControl.Web.Helpers;
+using ClimateControl.Web.Models;
+using PagedList;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using ClimateControl.Web.Helpers;
-using ClimateControl.Web.Models;
-using Microsoft.Practices.ObjectBuilder2;
-using PagedList;
 
 namespace ClimateControl.Web.Controllers
 {
@@ -21,8 +18,7 @@ namespace ClimateControl.Web.Controllers
         public ActionResult Index(string sortOrder, int? page)
         {
             ViewBag.CurrentSort = sortOrder;
-            var sensorData = from s in db.SensorData
-                                select s;
+            var sensorData = GetSensorData();
             switch (sortOrder)
             {
                 case "date_asc":
@@ -80,8 +76,13 @@ namespace ClimateControl.Web.Controllers
             return View(sensorData.ToPagedList(pageNumber, pageSize));
         }
 
+        
+        private IQueryable<SensorData> GetSensorData()
+        {
+            return from s in db.SensorData
+                select s;
+        }
 
-        // GET: Sensor/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -131,10 +132,8 @@ namespace ClimateControl.Web.Controllers
             var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             //Time zone difference between FLE time (Kiev zone) and UTC
             var fleOffset = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time").BaseUtcOffset;
-
             DateTime startDateTime;
             DateTime endDateTime;
-
 
             switch (range)
             {
@@ -200,9 +199,7 @@ namespace ClimateControl.Web.Controllers
 
 
             var sensorData
-                = from s in db.SensorData
-                where (s.timestamp >= startDateTime && s.timestamp <= endDateTime)
-                select s;
+                = GetSensorData().Where(d => d.timestamp >= startDateTime && d.timestamp <= endDateTime);
             return sensorData;
         }
 
