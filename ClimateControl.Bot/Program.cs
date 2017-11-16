@@ -52,7 +52,10 @@ namespace ClimateControl.Bot
                 if (latestSensorData != null)
                 {
                     var reply =
-                        $"Temperature: {latestSensorData.Temperature:0.0}C\nHumidity: {latestSensorData.Humidity:0.00}%\nCO2: {latestSensorData.CO2}\nLast updated: {TimeZoneConverter.Convert(latestSensorData.Timestamp)}";
+                        $"Temperature: {latestSensorData.Temperature:0.0}C\n" +
+                        $"Humidity: {latestSensorData.Humidity:0.00}%\n" +
+                        $"CO2: {latestSensorData.CO2}\n" +
+                        $"Updated: {TimeZoneConverter.Convert(latestSensorData.Timestamp):dd/MM/yyyy HH:mm:ss}";
                     Console.WriteLine($"Sending response: {reply}");
                     await Bot.SendTextMessageAsync(message.Chat.Id, reply);
                 }
