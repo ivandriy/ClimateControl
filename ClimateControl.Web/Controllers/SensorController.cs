@@ -73,12 +73,13 @@ namespace ClimateControl.Web.Controllers
                     break;
             }
             int pageSize = 30;
-            int pageNumber = (page ?? 1);            
-            foreach (Sensor data in sensorData)
-            {                
-                data.Timestamp = TimeZoneConverter.Convert(data.Timestamp);
-            }
-            return View(sensorData.ToPagedList(pageNumber, pageSize));
+            int pageNumber = (page ?? 1);
+            var result = sensorData.ToPagedList(pageNumber, pageSize);
+            foreach (var r in result)
+            {
+                r.Timestamp = TimeZoneConverter.Convert(r.Timestamp);
+            }            
+            return View(result);
         }       
 
         public ActionResult Details(int? id)
@@ -92,6 +93,7 @@ namespace ClimateControl.Web.Controllers
             {
                 return HttpNotFound();
             }
+            sensorData.Timestamp = TimeZoneConverter.Convert(sensorData.Timestamp);
             return View(sensorData);
         }
 

@@ -10,8 +10,8 @@ namespace ClimateControl.Web.Helpers
         private const string TimeZone = "FLE Standard Time";        
         public static DateTime Convert(DateTime utcTime)
         {
-            var localTime = TimeZoneInfo.ConvertTimeFromUtc(utcTime, TimeZoneInfo.FindSystemTimeZoneById(TimeZone));
-            return localTime;
+            var result = TimeZoneInfo.ConvertTimeFromUtc(utcTime, TimeZoneInfo.FindSystemTimeZoneById(TimeZone));
+            return result;
         }
     }
 }
