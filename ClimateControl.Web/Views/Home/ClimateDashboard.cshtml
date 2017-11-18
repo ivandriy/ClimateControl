@@ -28,7 +28,7 @@
             console.log("Updating TemperatureChart");
             $.getJSON(url,
                 function (data) {
-                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + " C)";
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + "C)";
                     chart.data.labels = [];
                     chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
@@ -71,7 +71,7 @@
                 {
                     display: true,
                     text: "",
-                    fontSize: 16
+                    fontSize: 18
                 },
                 scales: {
                     yAxes: [
@@ -107,7 +107,7 @@
             console.log("Updating HumidityChart");
             $.getJSON(url,
                 function (data) {
-                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + " %)";
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + "%)";
                     chart.data.labels = [];
                     chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
@@ -150,7 +150,7 @@
                 {
                     display: true,
                     text: "",
-                    fontSize: 16
+                    fontSize: 18
                 },
                 scales: {
                     yAxes: [
@@ -186,7 +186,7 @@
             console.log("Updating CO2Chart");
             $.getJSON(url,
                 function (data) {
-                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageCO2 + " )";
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageCO2 + " ppm)";
                     chart.data.labels = [];
                     chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
@@ -229,7 +229,7 @@
                 {
                     display: true,
                     text: "",
-                    fontSize: 16
+                    fontSize: 18
                 },
                 scales: {
                     yAxes: [
