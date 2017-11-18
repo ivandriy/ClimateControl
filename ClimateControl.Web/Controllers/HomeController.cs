@@ -42,5 +42,11 @@ namespace ClimateControl.Web.Controllers
         {            
             return View();
         }
+
+        public ActionResult ClimateDashboard()
+        {
+            var latestSensorData = GetLatestSensorData();
+            return View(latestSensorData);            
+        }
     }
 }

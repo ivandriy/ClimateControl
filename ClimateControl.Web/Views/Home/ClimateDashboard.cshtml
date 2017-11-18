@@ -1,0 +1,312 @@
+﻿@model ClimateControl.Data.Entities.Sensor
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ClimateDashboard</title>
+    @Styles.Render("~/Content/css")
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+    <script>
+
+        var dataRange = "4 hours";
+        var chartUpdateInterval = 60000;
+
+        var getTempUrl = '@Url.Action("GetTemperatures", "Sensor")' + "?range="+dataRange;
+        var getHumUrl = '@Url.Action("GetHumidities", "Sensor")' + "?range=" + dataRange;
+        var getCo2Url = '@Url.Action("GetCo2", "Sensor")' + "?range=" + dataRange;
+
+        var temperatureChart;
+        var humidityChart;
+        var co2Chart;
+
+        function updateTemperatureChart(url,chart) {
+            console.log("Updating TemperatureChart");
+            $.getJSON(url,
+                function (data) {
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + " C)";
+                    chart.data.labels = [];
+                    chart.data.datasets[0].data = [];
+                    var dates = data["Timestamps"];
+                    var temperatures = data["Temperatures"];
+                    for (var i = 0; i <= dates.length - 1; i++) {
+                        chart.data.labels.push(dates[i]);
+                    }
+                    for (var i = 0; i <= temperatures.length - 1; i++) {
+                        chart.data.datasets[0].data.push(temperatures[i]);
+                    }
+                    chart.update();
+                });
+
+        }
+
+        function loadTemperatureChart() {
+            console.log("Loading TemperatureChart");
+            var dataSet =
+            {
+                labels: [],
+                datasets: [
+                    {
+                        fill: true,
+                        label: 'Temperature, C',
+                        yAxisID: 'Temperature',
+                        borderColor: "rgba(255, 204, 0, 1)",
+                        pointBoarderColor: "rgba(255, 204, 0, 1)",
+                        backgroundColor: "rgba(255, 204, 0, 0.4)",
+                        pointHoverBackgroundColor: "rgba(255, 204, 0, 1)",
+                        pointHoverBorderColor: "rgba(255, 204, 0, 1)",
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        data: []
+                    }
+                ]
+            };
+
+            var options = {
+                title:
+                {
+                    display: true,
+                    text: "",
+                    fontSize: 16
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            id: 'Temperature',
+                            type: 'linear',
+                            scaleLabel: {
+                                labelString: 'Temperature, C',
+                                display: true
+                            },
+                            position: 'left'
+                        }
+                    ]
+                },
+                animation: {
+                    duration: 0
+                },
+                responsive: false,
+                maintainAspectRatio: true
+            };
+
+            var ctx1 = document.getElementById("TemperatureChart").getContext("2d");
+            temperatureChart = new Chart(ctx1,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+            updateTemperatureChart(getTempUrl,temperatureChart);
+        };
+
+        function updateHumidityChart(url, chart) {
+            console.log("Updating HumidityChart");
+            $.getJSON(url,
+                function (data) {
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + " %)";
+                    chart.data.labels = [];
+                    chart.data.datasets[0].data = [];
+                    var dates = data["Timestamps"];
+                    var humidities = data["Humidities"];
+                    for (var i = 0; i <= dates.length - 1; i++) {
+                        chart.data.labels.push(dates[i]);
+                    }
+                    for (var i = 0; i <= humidities.length - 1; i++) {
+                        chart.data.datasets[0].data.push(humidities[i]);
+                    }
+                    chart.update();
+                });
+
+        }
+
+        function loadHumidityChart() {
+            console.log("Loading HumidityChart");
+            var dataSet =
+            {
+                labels: [],
+                datasets: [
+                    {
+                        fill: true,
+                        label: 'Humidity, %',
+                        yAxisID: 'Humidity',
+                        borderColor: "rgba(24, 120, 240, 1)",
+                        pointBoarderColor: "rgba(24, 120, 240, 1)",
+                        backgroundColor: "rgba(24, 120, 240, 0.4)",
+                        pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
+                        pointHoverBorderColor: "rgba(24, 120, 240, 1)",
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        data: []
+                    }
+                ]
+            };
+
+            var options = {
+                title:
+                {
+                    display: true,
+                    text: "",
+                    fontSize: 16
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            id: 'Humidity',
+                            type: 'linear',
+                            scaleLabel: {
+                                labelString: 'Humidity, %',
+                                display: true
+                            },
+                            position: 'left'
+                        }
+                    ]
+                },
+                animation: {
+                    duration: 0
+                },
+                responsive: false,
+                maintainAspectRatio: true
+            };
+
+            var ctx2 = document.getElementById("HumidityChart").getContext("2d");
+            humidityChart = new Chart(ctx2,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+            updateHumidityChart(getHumUrl, humidityChart);
+        };
+                
+        function updateCO2Chart(url,chart) {
+            console.log("Updating CO2Chart");
+            $.getJSON(url,
+                function (data) {
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageCO2 + " )";
+                    chart.data.labels = [];
+                    chart.data.datasets[0].data = [];
+                    var dates = data["Timestamps"];
+                    var co2 = data["CO2"];
+                    for (var i = 0; i <= dates.length - 1; i++) {
+                        chart.data.labels.push(dates[i]);
+                    }
+                    for (var i = 0; i <= co2.length - 1; i++) {
+                        chart.data.datasets[0].data.push(co2[i]);
+                    }
+                    chart.update();
+                });
+
+        }
+
+        function loadCO2Chart() {
+            console.log("Loading CO2Chart");
+            var dataSet =
+            {
+                labels: [],
+                datasets: [
+                    {
+                        fill: true,
+                        label: 'CO2',
+                        yAxisID: 'CO2',
+                        borderColor: "rgba(170,0,120, 0.8)",
+                        pointBoarderColor: "rgba(209,202,176, 0.8)",
+                        backgroundColor: "rgba(24, 120, 240, 0.4)",
+                        pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
+                        pointHoverBorderColor: "rgba(24, 120, 240, 1)",
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        data: []
+                    }
+                ]
+            };
+
+            var options = {
+                title:
+                {
+                    display: true,
+                    text: "",
+                    fontSize: 16
+                },
+                scales: {
+                    yAxes: [
+                        {
+                            id: 'CO2',
+                            type: 'linear',
+                            scaleLabel: {
+                                labelString: 'CO2',
+                                display: true
+                            },
+                            position: 'left'
+                        }
+                    ]
+                },
+                animation: {
+                    duration: 0
+                },
+                responsive: false,
+                maintainAspectRatio: true
+            };
+
+            var ctx3 = document.getElementById("CO2Chart").getContext("2d");
+            co2Chart = new Chart(ctx3,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+            updateCO2Chart(getCo2Url, co2Chart);
+        };
+
+
+        window.onload = function() {
+            loadTemperatureChart();
+            loadHumidityChart();
+            loadCO2Chart();
+        };
+        
+        setInterval("$('#climatenow').load('ClimateNow')", 30000);
+        setInterval(function() {
+            updateTemperatureChart(getTempUrl, temperatureChart);
+            updateHumidityChart(getHumUrl, humidityChart);
+            updateCO2Chart(getCo2Url, co2Chart);
+        }, chartUpdateInterval);
+
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div align="center">
+                <div id="climatenow">
+                    @Html.Partial("ClimateNow", @Model)
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div>
+                <canvas width="600" height="300" id="TemperatureChart"></canvas>
+            </div>
+           
+        </div>
+    </div>
+<div class="row">
+    <div class="col-md-6">
+        <div>
+            <canvas width="600" height="300" id="HumidityChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div>
+            <canvas width="600" height="300" id="CO2Chart"></canvas>
+        </div> 
+    </div>
+</div>
+    </div>
+</body>
+</html>

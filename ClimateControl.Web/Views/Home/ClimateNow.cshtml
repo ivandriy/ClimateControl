@@ -1,5 +1,5 @@
 ﻿@using ClimateControl.Web.Helpers
-@model ClimateControl.Data.Entities.Sensor   
+@model ClimateControl.Data.Entities.Sensor    
 <div>
     <div>
         <table>
@@ -8,9 +8,9 @@
                     <img src="~/images/climate.png" class="img-rounded" height="125" width="125" />
                 </td>
                 <td>
-                    <h3 class="text-success" align="center">Climate now:</h3>
+                    <h3 class="text-success" align="center">Climate now:</h3>  
                     <ul>
-                        <li>Temperature: @Html.DisplayFor(temp =>@Model.Temperature) C</li>
+                        <li>Temperature: @Html.DisplayFor(temp => @Model.Temperature) C</li>
                         <li>Humidity: @Html.DisplayFor(hum => @Model.Humidity) %</li>
                         <li>CO2: @Model.CO2</li>
                         <li>Updated: @Html.DisplayFor(timestamp => @Model.Timestamp)</li>                        

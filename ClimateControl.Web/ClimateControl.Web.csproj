@@ -275,6 +275,7 @@
     <Content Include="Views\Sensor\Co2Chart.cshtml" />
     <Content Include="Views\Home\ClimateNow.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\ClimateDashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

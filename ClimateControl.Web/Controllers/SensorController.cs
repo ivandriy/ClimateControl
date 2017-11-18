@@ -122,11 +122,6 @@ namespace ClimateControl.Web.Controllers
             return Json(temperatures, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult NewTemperatureChart()
-        {
-            return View();
-        }
-
 
         public JsonResult GetHumidities(string range)
         {
@@ -192,6 +187,15 @@ namespace ClimateControl.Web.Controllers
 
             switch (range)
             {
+                case "4 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-4);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+
+                case "8 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-8);
+                    endDateTime = DateTime.UtcNow;
+                    break;
                 case "day":
                     if (utcOffset.Hours < 0)
                     {
