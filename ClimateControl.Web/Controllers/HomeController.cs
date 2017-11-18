@@ -7,11 +7,11 @@ namespace ClimateControl.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ISensorDataRepository repository;
+        private readonly ISensorDataRepository _repository;
 
         public HomeController(ISensorDataRepository repository)
         {
-            this.repository = repository;
+            this._repository = repository;
         }
 
         public ActionResult Index()
@@ -23,7 +23,7 @@ namespace ClimateControl.Web.Controllers
         private Sensor GetLatestSensorData()
         {
             Sensor latestSensorData;
-            latestSensorData = repository.GetSensorData().OrderByDescending(d => d.Timestamp).Take(1).SingleOrDefault();
+            latestSensorData = _repository.GetSensorData().OrderByDescending(d => d.Timestamp).Take(1).SingleOrDefault();
             if (latestSensorData != null)
             {
                 latestSensorData.Timestamp = TimeZoneConverter.Convert(latestSensorData.Timestamp);

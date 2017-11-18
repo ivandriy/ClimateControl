@@ -14,7 +14,7 @@
     <script>
         var dataSet =
         {
-            labels: [@Html.Raw(ViewBag.DatesList)],
+            labels: [],
             datasets: [{
                 fill: true,
                 label: 'Humidity, %',
@@ -25,7 +25,7 @@
                 pointHoverBackgroundColor: "rgba(24, 120, 240, 1)",
                 pointHoverBorderColor: "rgba(24, 120, 240, 1)",
                 borderWidth: 2,
-                data: [@ViewBag.HumiditiesList]
+                data: []
             }]
         };
 
@@ -33,7 +33,7 @@
             title:
             {
                 display: true,
-                text: "@ViewBag.HumChartRange  (average: @ViewBag.AvgHumidity %)",
+                text: "",
                 fontSize: 36
             },
             scales: {
@@ -53,19 +53,38 @@
 
 
 
-        window.onload = function () {
-            var ctx1 = document.getElementById("HumidityChart").getContext("2d");
-            window.myBar = new Chart(ctx1,
-                {
-                    type: 'line',
-                    data: dataSet,
-                    options: options
+        var url = '@Url.Action("GetHumidities", "Sensor")';
+
+        function PopulateChart(url) {
+            $.getJSON(url,
+                function(data) {
+                    var dates = data["Timestamps"];
+                    var humidities = data["Humidities"];
+                    options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + " %)";
+                    dataSet.labels = [];
+                    dataSet.datasets[0].data = [];
+                    for (var i = 0; i <= dates.length - 1; i++) {
+                        dataSet.labels.push(dates[i]);
+                    }
+                    for (var i = 0; i <= humidities.length - 1; i++) {
+                        dataSet.datasets[0].data.push(humidities[i]);
+                    }
+                    var ctx1 = document.getElementById("HumidityChart").getContext("2d");
+                    window.myBar = new Chart(ctx1,
+                        {
+                            type: 'line',
+                            data: dataSet,
+                            options: options
+                        });
                 });
+
         }
-        var url = '@Url.Action("HumidityChart", "Sensor")';
-        function CallChangefunc(val){
-            location.href = url + "?range=" + val;
+
+        function ChartRangeChanged(val) {
+            PopulateChart(url + "?range=" + val);
         }
+
+        window.onload = PopulateChart(url); 
     </script>  
 </head>
 <body>
@@ -80,16 +99,15 @@
         <tr>
             <td>
                 @Html.DropDownList("ChartRange", new[]
-                {
-                    new SelectListItem() {Text = "", Value = "", Selected = true},
+                {                    
                     new SelectListItem() {Text = "24 Hours", Value = "24 hours",},
-                    new SelectListItem() {Text = "Day", Value = "day",},
+                    new SelectListItem() {Text = "Day", Value = "day",Selected = true},
                     new SelectListItem() {Text = "7 days", Value = "7 days",},
                     new SelectListItem() {Text = "Week", Value = "week"},
                     new SelectListItem() {Text = "30 days", Value = "30 days",},
                     new SelectListItem() {Text = "Month", Value = "month"}
             },
-                new { @onchange = "CallChangefunc(this.value)", @class = "form-control" })
+                new { @onchange = "ChartRangeChanged(this.value)", @class = "form-control" })
             </td>
         </tr>
     </table>

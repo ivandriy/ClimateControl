@@ -8,22 +8,23 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 
 namespace ClimateControl.Web.Controllers
 {
     public class SensorController : Controller
     {
-        private readonly ISensorDataRepository repository;
+        private readonly ISensorDataRepository _repository;
 
         public SensorController(ISensorDataRepository repository)
         {
-            this.repository = repository;
+            this._repository = repository;
         }
 
         public ActionResult Index(string sortOrder, int? page)
         {
             ViewBag.CurrentSort = sortOrder;
-            var sensorData = repository.GetSensorData();
+            var sensorData = _repository.GetSensorData();
             switch (sortOrder)
             {
                 case "date_asc":
@@ -88,7 +89,7 @@ namespace ClimateControl.Web.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Sensor sensorData = repository.GetSensorData(id);
+            Sensor sensorData = _repository.GetSensorData(id);
             if (sensorData == null)
             {
                 return HttpNotFound();
@@ -97,42 +98,64 @@ namespace ClimateControl.Web.Controllers
             return View(sensorData);
         }
 
-        public ActionResult TemperatureChart(string range)
-        {
-            var temperatureData = FilterSensorDataByRange(range)
-                .Select(d=> new
-                    {
-                        d.Temperature,
-                        d.Timestamp
-                    })
-                .ToList();
-           
-            ViewBag.DatesList = string.Join(",", NormalizeDates(temperatureData.Select(t => t.Timestamp))).Trim();
-            ViewBag.TemperaturesList = string.Join(",", temperatureData.Select(t=>t.Temperature)).Trim();
-            ViewBag.TempChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}";
-            ViewBag.AvgTemperature = temperatureData.Select(t=>t.Temperature).Average().ToString("F");
+        public ActionResult TemperatureChart()
+        {            
             return View();
         }
 
-        public ActionResult HumidityChart(string range)
+        public JsonResult GetTemperatures(string range)
+        {
+            var humidityData = FilterSensorDataByRange(range)
+                .Select(d => new 
+                {
+                    d.Temperature,
+                    d.Timestamp
+                })
+                .ToList();                    
+            var temperatures = new
+            {
+                Temperatures = humidityData.Select(t=>t.Temperature),
+                Timestamps = humidityData.Select(t=>ConverAndFormatDate(t.Timestamp)),
+                ChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}",
+                AverageTemperature = humidityData.Select(t => t.Temperature).Average().ToString("F")
+        };            
+            return Json(temperatures, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult NewTemperatureChart()
+        {
+            return View();
+        }
+
+
+        public JsonResult GetHumidities(string range)
         {
             var humidityData = FilterSensorDataByRange(range)
                 .Select(h => new
-                    {
-                        h.Humidity,
-                        h.Timestamp
-                    })
-                    .ToList();
+                {
+                    h.Humidity,
+                    h.Timestamp
+                })
+                .ToList();
 
-            ViewBag.DatesList = string.Join(",", NormalizeDates(humidityData.Select(h=>h.Timestamp))).Trim();
-            ViewBag.HumiditiesList = string.Join(",", humidityData.Select(h=>h.Humidity)).Trim();
-            ViewBag.HumChartRange = string.IsNullOrEmpty(range) ? "Humidity by day" : $"Humidity by {range}";
-            ViewBag.AvgHumidity = humidityData.Select(h => h.Humidity).Average().ToString("F");
+            var humidities = new
+            {
+                Humidities = humidityData.Select(h=> h.Humidity),
+                Timestamps = humidityData.Select(h=> ConverAndFormatDate(h.Timestamp)),
+                ChartRange = string.IsNullOrEmpty(range) ? "Humidity by day" : $"Humidity by {range}",
+                AverageHumidity = humidityData.Select(h => h.Humidity).Average().ToString("F")
 
+            };
+            return Json(humidities, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult HumidityChart()
+        {
             return View();
         }
 
-        public ActionResult Co2Chart(string range)
+
+        public JsonResult GetCo2(string range)
         {
             var co2Data = FilterSensorDataByRange(range)
                 .Select(c => new
@@ -142,10 +165,19 @@ namespace ClimateControl.Web.Controllers
                 })
                 .ToList();
 
-            ViewBag.DatesList = string.Join(",", NormalizeDates(co2Data.Select(c=>c.Timestamp))).Trim();
-            ViewBag.CO2List = string.Join(",", co2Data.Select(c=>c.CO2)).Trim();
-            ViewBag.CO2ChartRange = string.IsNullOrEmpty(range) ? "CO2 by day" : $"CO2 by {range}";
-            ViewBag.AvgCO2 = co2Data.Select(c => c.CO2).Average().ToString("F");
+            var co2 = new
+            {
+                CO2 = co2Data.Select(c => c.CO2),
+                Timestamps = co2Data.Select(c => ConverAndFormatDate(c.Timestamp)),
+                ChartRange = string.IsNullOrEmpty(range) ? "CO2 by day" : $"CO2 by {range}",
+                AverageCO2 = co2Data.Select(c => c.CO2).Average().ToString("F")
+            };
+
+            return Json(co2, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Co2Chart(string range)
+        {            
             return View();
         }
 
@@ -221,25 +253,22 @@ namespace ClimateControl.Web.Controllers
             }
 
             var sensorData
-                = repository.GetSensorData().Where(d => d.Timestamp >= startDateTime && d.Timestamp <= endDateTime);
+                = _repository.GetSensorData().Where(d => d.Timestamp >= startDateTime && d.Timestamp <= endDateTime);
             return sensorData;
         }
 
-        private static IEnumerable<string> NormalizeDates(IEnumerable<DateTime> dates)
+        private static string ConverAndFormatDate(DateTime date)
         {
-            var datesList = dates.Select(d => TimeZoneConverter.Convert(d)
-                    .ToString("yyyy-MM-dd HH:mm",
-                        CultureInfo.InvariantCulture))
-                .Select(str => $"\"{str}\"")
-                .ToList();
-            return datesList;
+            return (TimeZoneConverter.Convert(date)).ToString("yyyy-MM-dd HH:mm",
+                CultureInfo.InvariantCulture);
+
         }
-        
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                repository.Dispose();
+                _repository.Dispose();
             }
             base.Dispose(disposing);
         }
