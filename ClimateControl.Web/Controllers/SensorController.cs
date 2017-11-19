@@ -1,5 +1,4 @@
 ﻿using ClimateControl.Data.Entities;
-using ClimateControl.Web.Helpers;
 using PagedList;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using ClimateControl.Common;
 using Newtonsoft.Json;
 
 namespace ClimateControl.Web.Controllers
@@ -15,10 +15,12 @@ namespace ClimateControl.Web.Controllers
     public class SensorController : Controller
     {
         private readonly ISensorDataRepository _repository;
+        private readonly SensorDataProcessing _processing;
 
         public SensorController(ISensorDataRepository repository)
         {
             this._repository = repository;
+            _processing = new SensorDataProcessing(repository);
         }
 
         public ActionResult Index(string sortOrder, int? page)
@@ -78,7 +80,7 @@ namespace ClimateControl.Web.Controllers
             var result = sensorData.ToPagedList(pageNumber, pageSize);
             foreach (var r in result)
             {
-                r.Timestamp = TimeZoneConverter.Convert(r.Timestamp);
+                r.Timestamp = DateTimeHelper.ConvertUtcToLocalTime(r.Timestamp);
             }            
             return View(result);
         }       
@@ -94,7 +96,7 @@ namespace ClimateControl.Web.Controllers
             {
                 return HttpNotFound();
             }
-            sensorData.Timestamp = TimeZoneConverter.Convert(sensorData.Timestamp);
+            sensorData.Timestamp = DateTimeHelper.ConvertUtcToLocalTime(sensorData.Timestamp);
             return View(sensorData);
         }
 
@@ -102,10 +104,9 @@ namespace ClimateControl.Web.Controllers
         {            
             return View();
         }
-
         public JsonResult GetTemperatures(string range)
         {
-            var humidityData = FilterSensorDataByRange(range)
+            var humidityData = _processing.GetSensorDataByRange(range)
                 .Select(d => new 
                 {
                     d.Temperature,
@@ -115,17 +116,16 @@ namespace ClimateControl.Web.Controllers
             var temperatures = new
             {
                 Temperatures = humidityData.Select(t=>t.Temperature),
-                Timestamps = humidityData.Select(t=>ConverAndFormatDate(t.Timestamp)),
+                Timestamps = humidityData.Select(t=>ConvertAndFormatDate(t.Timestamp)),
                 ChartRange = string.IsNullOrEmpty(range) ? "Temperature by day" : $"Temperature by {range}",
                 AverageTemperature = humidityData.Select(t => t.Temperature).Average().ToString("F")
         };            
             return Json(temperatures, JsonRequestBehavior.AllowGet);
         }
 
-
         public JsonResult GetHumidities(string range)
         {
-            var humidityData = FilterSensorDataByRange(range)
+            var humidityData = _processing.GetSensorDataByRange(range)
                 .Select(h => new
                 {
                     h.Humidity,
@@ -136,7 +136,7 @@ namespace ClimateControl.Web.Controllers
             var humidities = new
             {
                 Humidities = humidityData.Select(h=> h.Humidity),
-                Timestamps = humidityData.Select(h=> ConverAndFormatDate(h.Timestamp)),
+                Timestamps = humidityData.Select(h=> ConvertAndFormatDate(h.Timestamp)),
                 ChartRange = string.IsNullOrEmpty(range) ? "Humidity by day" : $"Humidity by {range}",
                 AverageHumidity = humidityData.Select(h => h.Humidity).Average().ToString("F")
 
@@ -149,10 +149,9 @@ namespace ClimateControl.Web.Controllers
             return View();
         }
 
-
         public JsonResult GetCo2(string range)
         {
-            var co2Data = FilterSensorDataByRange(range)
+            var co2Data = _processing.GetSensorDataByRange(range)
                 .Select(c => new
                 {
                     c.CO2,
@@ -163,7 +162,7 @@ namespace ClimateControl.Web.Controllers
             var co2 = new
             {
                 CO2 = co2Data.Select(c => c.CO2),
-                Timestamps = co2Data.Select(c => ConverAndFormatDate(c.Timestamp)),
+                Timestamps = co2Data.Select(c => ConvertAndFormatDate(c.Timestamp)),
                 ChartRange = string.IsNullOrEmpty(range) ? "CO2 by day" : $"CO2 by {range}",
                 AverageCO2 = co2Data.Select(c => c.CO2).Average().ToString("F")
             };
@@ -174,100 +173,13 @@ namespace ClimateControl.Web.Controllers
         public ActionResult Co2Chart(string range)
         {            
             return View();
-        }
-
-        private IQueryable<Sensor> FilterSensorDataByRange(string range)
+        }        
+        private static string ConvertAndFormatDate(DateTime date)
         {
-            //Time zone difference between local time and UTC
-            var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
-            //Time zone difference between FLE time (Kiev zone) and UTC
-            var fleOffset = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time").BaseUtcOffset;
-            DateTime startDateTime;
-            DateTime endDateTime;
-
-            switch (range)
-            {
-                case "4 hours":
-                    startDateTime = DateTime.UtcNow.AddHours(-4);
-                    endDateTime = DateTime.UtcNow;
-                    break;
-
-                case "8 hours":
-                    startDateTime = DateTime.UtcNow.AddHours(-8);
-                    endDateTime = DateTime.UtcNow;
-                    break;
-                case "day":
-                    if (utcOffset.Hours < 0)
-                    {
-                        startDateTime = DateTime.Today.ToUniversalTime();
-                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
-                    }
-                    else
-                    {
-                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
-                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
-                    }
-                    break;
-                case "24 hours":
-                    startDateTime = DateTime.UtcNow.AddHours(-24);
-                    endDateTime = DateTime.UtcNow;
-                    break;
-                case "7 days":
-                    startDateTime = DateTime.UtcNow.AddDays(-7);
-                    endDateTime = DateTime.UtcNow;
-                    break;
-                case "week":
-                    if (utcOffset.Hours < 0)
-                    {
-                        startDateTime = DateTime.Today.AddDays(
-                                ((int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
-                                (int)DateTime.Today.DayOfWeek)
-                            .ToUniversalTime();
-                        endDateTime = startDateTime.AddDays(7).AddTicks(-1);
-                    }
-                    else
-                    {
-                        startDateTime = DateTime.Today.AddDays(
-                                ((int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
-                                (int)DateTime.Today.DayOfWeek)
-                            .ToUniversalTime().AddHours(-fleOffset.Hours);
-                        endDateTime = startDateTime.AddDays(7).AddHours(-fleOffset.Hours).AddTicks(-1);
-                    }
-                    break;
-                case "30 days":
-                    startDateTime = DateTime.UtcNow.AddDays(-30);
-                    endDateTime = DateTime.UtcNow;
-                    break;
-                case "month":
-                    startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToUniversalTime();
-                    endDateTime = startDateTime.ToUniversalTime().AddMonths(1).AddDays(-1).AddTicks(-1);
-                    break;
-                default:
-                    if (utcOffset.Hours < 0)
-                    {
-                        startDateTime = DateTime.Today.ToUniversalTime();
-                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
-                    }
-                    else
-                    {
-                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
-                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
-                    }
-                    break;
-            }
-
-            var sensorData
-                = _repository.GetSensorData().Where(d => d.Timestamp >= startDateTime && d.Timestamp <= endDateTime);
-            return sensorData;
-        }
-
-        private static string ConverAndFormatDate(DateTime date)
-        {
-            return (TimeZoneConverter.Convert(date)).ToString("yyyy-MM-dd HH:mm",
+            return (DateTimeHelper.ConvertUtcToLocalTime(date)).ToString("yyyy-MM-dd HH:mm",
                 CultureInfo.InvariantCulture);
 
         }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClimateControl.Data", "Clim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClimateControl.AzureDb", "ClimateControl.AzureDb\ClimateControl.AzureDb.csproj", "{8640EBD9-F631-4D62-807C-1D6790CBE2C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClimateControl.Common", "ClimateControl.Common\ClimateControl.Common.csproj", "{4371BCD3-55E6-47EE-8DFF-01FE234F05FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{8640EBD9-F631-4D62-807C-1D6790CBE2C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8640EBD9-F631-4D62-807C-1D6790CBE2C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8640EBD9-F631-4D62-807C-1D6790CBE2C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4371BCD3-55E6-47EE-8DFF-01FE234F05FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4371BCD3-55E6-47EE-8DFF-01FE234F05FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4371BCD3-55E6-47EE-8DFF-01FE234F05FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4371BCD3-55E6-47EE-8DFF-01FE234F05FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

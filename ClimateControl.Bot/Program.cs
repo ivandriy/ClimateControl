@@ -1,10 +1,8 @@
 ﻿using ClimateControl.AzureDb;
-using ClimateControl.Data.Entities;
-using ClimateControl.Web.Helpers;
+using ClimateControl.Common;
 using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -15,10 +13,12 @@ namespace ClimateControl.Bot
 {
     class Program
     {
-        private static string botKey = ConfigurationManager.AppSettings["TelegramBotKey"];
+        private static readonly string BotKey = ConfigurationManager.AppSettings["TelegramBotKey"];
         private static readonly TelegramBotClient Bot =
-            new TelegramBotClient(botKey);
-        private static AzureDbRepository repository = new AzureDbRepository();
+            new TelegramBotClient(BotKey);
+        
+        private static readonly AzureDbRepository Repository = new AzureDbRepository();
+        private static readonly SensorDataProcessing Processing = new SensorDataProcessing(Repository);
 
         static void Main(string[] args)
         {
@@ -44,18 +44,14 @@ namespace ClimateControl.Bot
             Console.WriteLine($"Received message: {message.Text}\nFrom: {message.From.Username}");
             if (message.Text.StartsWith("/get_climate"))
             {
-                Sensor latestSensorData;
-                latestSensorData = repository.GetSensorData()
-                    .OrderByDescending(d => d.Timestamp)
-                    .Take(1)
-                    .SingleOrDefault();                    
+                var latestSensorData = Processing.GetLatestSensorData();
                 if (latestSensorData != null)
                 {
                     var reply =
                         $"Temperature: {latestSensorData.Temperature:0.0}C\n" +
                         $"Humidity: {latestSensorData.Humidity:0.00}%\n" +
                         $"CO2: {latestSensorData.CO2}\n" +
-                        $"Updated: {TimeZoneConverter.Convert(latestSensorData.Timestamp):dd/MM/yyyy HH:mm:ss}";
+                        $"Updated: {DateTimeHelper.ConvertUtcToLocalTime(latestSensorData.Timestamp):dd/MM/yyyy HH:mm:ss}";
                     Console.WriteLine($"Sending response: {reply}");
                     await Bot.SendTextMessageAsync(message.Chat.Id, reply);
                 }
