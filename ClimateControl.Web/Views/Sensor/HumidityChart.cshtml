@@ -51,40 +51,47 @@
             maintainAspectRatio: true
         };
 
-
-
         var url = '@Url.Action("GetHumidities", "Sensor")';
+        var humidityChart;
 
-        function PopulateChart(url) {
+        function updateHumidityChart(url, chart) {
+            console.log("Updating HumidityChart");
             $.getJSON(url,
-                function(data) {
+                function (data) {
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + " %)";
+                    chart.data.labels = [];
+                    chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
                     var humidities = data["Humidities"];
-                    options.title.text = data.ChartRange + " (average: " + data.AverageHumidity + " %)";
-                    dataSet.labels = [];
-                    dataSet.datasets[0].data = [];
                     for (var i = 0; i <= dates.length - 1; i++) {
-                        dataSet.labels.push(dates[i]);
+                        chart.data.labels.push(dates[i]);
                     }
                     for (var i = 0; i <= humidities.length - 1; i++) {
-                        dataSet.datasets[0].data.push(humidities[i]);
+                        chart.data.datasets[0].data.push(humidities[i]);
                     }
-                    var ctx1 = document.getElementById("HumidityChart").getContext("2d");
-                    window.myBar = new Chart(ctx1,
-                        {
-                            type: 'line',
-                            data: dataSet,
-                            options: options
-                        });
+                    chart.update();
                 });
 
         }
-
-        function ChartRangeChanged(val) {
-            PopulateChart(url + "?range=" + val);
+        function loadHumidityChart() {
+            console.log("Loading HumidityChart");
+            var ctx2 = document.getElementById("HumidityChart").getContext("2d");
+            humidityChart = new Chart(ctx2,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+            updateHumidityChart(url, humidityChart);
+        };
+        
+        function onChartRangeChanged(val) {            
+            updateHumidityChart(url + "?range=" + val, humidityChart);
         }
-
-        window.onload = PopulateChart(url); 
+        
+        window.onload = function() {
+            loadHumidityChart();
+        }
     </script>  
 </head>
 <body>
@@ -107,7 +114,7 @@
                     new SelectListItem() {Text = "30 days", Value = "30 days",},
                     new SelectListItem() {Text = "Month", Value = "month"}
             },
-                new { @onchange = "ChartRangeChanged(this.value)", @class = "form-control" })
+                new { @onchange = "onChartRangeChanged(this.value)", @class = "form-control" })
             </td>
         </tr>
     </table>

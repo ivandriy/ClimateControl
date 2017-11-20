@@ -12,23 +12,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
     <script>
         var dataSet =
-        {
-            labels: [],
-            datasets: [
-                {
-                    fill: true,
-                    label: 'Temperature, C',
-                    yAxisID: 'Temperature',
-                    borderColor: "rgba(255, 204, 0, 1)",
-                    pointBoarderColor: "rgba(255, 204, 0, 1)",
-                    backgroundColor: "rgba(255, 204, 0, 0.4)",
-                    pointHoverBackgroundColor: "rgba(255, 204, 0, 1)",
-                    pointHoverBorderColor: "rgba(255, 204, 0, 1)",
-                    borderWidth: 2,
-                    data: []
-                }
-            ]
-        };
+            {
+                labels: [],
+                datasets: [
+                    {
+                        fill: true,
+                        label: 'Temperature, C',
+                        yAxisID: 'Temperature',
+                        borderColor: "rgba(255, 204, 0, 1)",
+                        pointBoarderColor: "rgba(255, 204, 0, 1)",
+                        backgroundColor: "rgba(255, 204, 0, 0.4)",
+                        pointHoverBackgroundColor: "rgba(255, 204, 0, 1)",
+                        pointHoverBorderColor: "rgba(255, 204, 0, 1)",
+                        borderWidth: 2,
+                        data: []
+                    }
+                ]
+            };
 
         var options = {
             title:
@@ -56,35 +56,46 @@
 
         var url = '@Url.Action("GetTemperatures", "Sensor")';
 
-        function PopulateChart(url) {
+        var temperatureChart;
+
+        function updateTemperatureChart(url,chart) {
+            console.log("Updating TemperatureChart");
             $.getJSON(url,
-                function(data) {
+                function (data) {
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature+" " + String.fromCharCode(176)+ "C)";
+                    chart.data.labels = [];
+                    chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
                     var temperatures = data["Temperatures"];
-                    options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + " C)";
-                    dataSet.labels = [];
-                    dataSet.datasets[0].data = [];
                     for (var i = 0; i <= dates.length - 1; i++) {
-                        dataSet.labels.push(dates[i]);
+                        chart.data.labels.push(dates[i]);
                     }
                     for (var i = 0; i <= temperatures.length - 1; i++) {
-                        dataSet.datasets[0].data.push(temperatures[i]);
+                        chart.data.datasets[0].data.push(temperatures[i]);
                     }
-                    var ctx1 = document.getElementById("TemperatureChart").getContext("2d");
-                    window.myBar = new Chart(ctx1,
-                        {
-                            type: 'line',
-                            data: dataSet,
-                            options: options
-                        });
+                    chart.update();
                 });
 
         }
 
-        function ChartRangeChanged(val) {
-            PopulateChart(url + "?range=" + val);
+        function loadTemperatureChart() {
+            console.log("Loading TemperatureChart");
+            var ctx1 = document.getElementById("TemperatureChart").getContext("2d");
+            temperatureChart = new Chart(ctx1,
+                {
+                    type: 'line',
+                    data: dataSet,
+                    options: options
+                });
+            updateTemperatureChart(url,temperatureChart);
+        };
+
+        function onChartRangeChanged(val) {            
+            updateTemperatureChart(url + "?range=" + val, temperatureChart);
+        }        
+        window.onload = function() {
+             loadTemperatureChart();
         }
-        window.onload = PopulateChart(url);        
     </script>  
 </head>
 <body>
@@ -107,7 +118,7 @@
                 new SelectListItem() {Text = "30 days", Value = "30 days",},
                 new SelectListItem() {Text = "Month", Value = "month"}
             },
-                new { @onchange = "ChartRangeChanged(this.value)", @class = "form-control" })
+                new { @onchange = "onChartRangeChanged(this.value)", @class = "form-control" })
         </td>
     </tr>
 </table>

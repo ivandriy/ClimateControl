@@ -28,7 +28,7 @@
             console.log("Updating TemperatureChart");
             $.getJSON(url,
                 function (data) {
-                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + "C)";
+                    chart.options.title.text = data.ChartRange + " (average: " + data.AverageTemperature + " " + String.fromCharCode(176)+ "C)";
                     chart.data.labels = [];
                     chart.data.datasets[0].data = [];
                     var dates = data["Timestamps"];
