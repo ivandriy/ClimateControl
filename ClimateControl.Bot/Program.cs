@@ -17,8 +17,7 @@ namespace ClimateControl.Bot
         private static readonly TelegramBotClient Bot =
             new TelegramBotClient(BotKey);
         
-        private static readonly AzureDbRepository Repository = new AzureDbRepository();
-        private static readonly SensorDataProcessing Processing = new SensorDataProcessing(Repository);
+        private static readonly AzureDbRepository Repository = new AzureDbRepository();        
 
         static void Main(string[] args)
         {
@@ -44,7 +43,7 @@ namespace ClimateControl.Bot
             Console.WriteLine($"Received message: {message.Text}\nFrom: {message.From.Username}");
             if (message.Text.StartsWith("/get_climate"))
             {
-                var latestSensorData = Processing.GetLatestSensorData();
+                var latestSensorData = Repository.GetLatestSensorData();
                 if (latestSensorData != null)
                 {
                     var reply =

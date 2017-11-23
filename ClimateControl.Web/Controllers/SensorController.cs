@@ -15,12 +15,10 @@ namespace ClimateControl.Web.Controllers
     public class SensorController : Controller
     {
         private readonly ISensorDataRepository _repository;
-        private readonly SensorDataProcessing _processing;
-
+        
         public SensorController(ISensorDataRepository repository)
         {
-            this._repository = repository;
-            _processing = new SensorDataProcessing(repository);
+            this._repository = repository;            
         }
 
         public ActionResult Index(string sortOrder, int? page)
@@ -106,7 +104,7 @@ namespace ClimateControl.Web.Controllers
         }
         public JsonResult GetTemperatures(string range)
         {
-            var humidityData = _processing.GetSensorDataByRange(range)
+            var humidityData = GetSensorDataByRange(range)
                 .Select(d => new 
                 {
                     d.Temperature,
@@ -125,7 +123,7 @@ namespace ClimateControl.Web.Controllers
 
         public JsonResult GetHumidities(string range)
         {
-            var humidityData = _processing.GetSensorDataByRange(range)
+            var humidityData = GetSensorDataByRange(range)
                 .Select(h => new
                 {
                     h.Humidity,
@@ -151,7 +149,7 @@ namespace ClimateControl.Web.Controllers
 
         public JsonResult GetCo2(string range)
         {
-            var co2Data = _processing.GetSensorDataByRange(range)
+            var co2Data = GetSensorDataByRange(range)
                 .Select(c => new
                 {
                     c.CO2,
@@ -173,7 +171,93 @@ namespace ClimateControl.Web.Controllers
         public ActionResult Co2Chart(string range)
         {            
             return View();
-        }        
+        }
+
+        public IEnumerable<Sensor> GetSensorDataByRange(string range)
+        {
+            //Time zone difference between local time and UTC
+            var utcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            //Time zone difference between FLE time (Kiev zone) and UTC
+            var fleOffset = TimeZoneInfo.FindSystemTimeZoneById("FLE Standard Time").BaseUtcOffset;
+            DateTime startDateTime;
+            DateTime endDateTime;
+
+            switch (range)
+            {
+                case "4 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-4);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+
+                case "8 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-8);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+                case "day":
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.ToUniversalTime();
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
+                    break;
+                case "24 hours":
+                    startDateTime = DateTime.UtcNow.AddHours(-24);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+                case "7 days":
+                    startDateTime = DateTime.UtcNow.AddDays(-7);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+                case "week":
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.AddDays(
+                                ((int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
+                                (int)DateTime.Today.DayOfWeek)
+                            .ToUniversalTime();
+                        endDateTime = startDateTime.AddDays(7).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddDays(
+                                ((int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek) -
+                                (int)DateTime.Today.DayOfWeek)
+                            .ToUniversalTime().AddHours(-fleOffset.Hours);
+                        endDateTime = startDateTime.AddDays(7).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
+                    break;
+                case "30 days":
+                    startDateTime = DateTime.UtcNow.AddDays(-30);
+                    endDateTime = DateTime.UtcNow;
+                    break;
+                case "month":
+                    startDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).ToUniversalTime();
+                    endDateTime = startDateTime.ToUniversalTime().AddMonths(1).AddDays(-1).AddTicks(-1);
+                    break;
+                default:
+                    if (utcOffset.Hours < 0)
+                    {
+                        startDateTime = DateTime.Today.ToUniversalTime();
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddTicks(-1);
+                    }
+                    else
+                    {
+                        startDateTime = DateTime.Today.AddHours(-fleOffset.Hours);
+                        endDateTime = DateTime.Today.ToUniversalTime().AddDays(1).AddHours(-fleOffset.Hours).AddTicks(-1);
+                    }
+                    break;
+            }
+
+            var sensorData
+                = _repository.GetSensorData(startDateTime, endDateTime);
+            return sensorData;
+        }
+
         private static string ConvertAndFormatDate(DateTime date)
         {
             return (DateTimeHelper.ConvertUtcToLocalTime(date)).ToString("yyyy-MM-dd HH:mm",

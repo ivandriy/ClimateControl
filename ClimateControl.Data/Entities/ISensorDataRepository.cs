@@ -8,7 +8,9 @@ namespace ClimateControl.Data.Entities
 {
     public interface ISensorDataRepository:IDisposable
     {
-        IQueryable<Sensor> GetSensorData();
+        IEnumerable<Sensor> GetSensorData();
+        IEnumerable<Sensor> GetSensorData(DateTime startTime, DateTime endTime);
         Sensor GetSensorData(int? id);
+        Sensor GetLatestSensorData();
     }
 }

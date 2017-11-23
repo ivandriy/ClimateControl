@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<parameters>
+  <parameter name="ClimateControl.AzureDb.DAL.ClimateControlEntities-Web.config Connection String"
+      description="DefaultConnection"
+      defaultValue="data source=climate-control.database.windows.net;initial catalog=ClimateControl;persist security info=True;user id=;password=;multipleactiveresultsets=True;application name=EntityFramework" providerName="System.Data.SqlClient" tags="" />
+</parameters>

@@ -8,17 +8,15 @@ namespace ClimateControl.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ISensorDataRepository _repository;
-        private readonly SensorDataProcessing _processing;
-
+        
         public HomeController(ISensorDataRepository repository)
         {
             this._repository = repository;
-            _processing = new SensorDataProcessing(repository);
         }
 
         public ActionResult Index()
         {
-            var latestSensorData = _processing.GetLatestSensorData();
+            var latestSensorData = _repository.GetLatestSensorData();
             if (latestSensorData != null)
             {
                 latestSensorData.Timestamp = DateTimeHelper.ConvertUtcToLocalTime(latestSensorData.Timestamp);
@@ -29,7 +27,7 @@ namespace ClimateControl.Web.Controllers
         [OutputCache(NoStore = true, Location = System.Web.UI.OutputCacheLocation.Client, Duration = 30)]
         public ActionResult ClimateNow()
         {
-            var latestSensorData = _processing.GetLatestSensorData();
+            var latestSensorData = _repository.GetLatestSensorData();
             if (latestSensorData != null)
             {
                 latestSensorData.Timestamp = DateTimeHelper.ConvertUtcToLocalTime(latestSensorData.Timestamp);
@@ -44,7 +42,7 @@ namespace ClimateControl.Web.Controllers
 
         public ActionResult ClimateDashboard()
         {
-            var latestSensorData = _processing.GetLatestSensorData();
+            var latestSensorData = _repository.GetLatestSensorData();
             if (latestSensorData != null)
             {
                 latestSensorData.Timestamp = DateTimeHelper.ConvertUtcToLocalTime(latestSensorData.Timestamp);

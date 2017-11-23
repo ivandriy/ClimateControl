@@ -1,11 +1,8 @@
-﻿using System;
+﻿using ClimateControl.AzureDb.DAL;
+using ClimateControl.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ClimateControl.AzureDb.DAL;
-using ClimateControl.Data.Entities;
-using SensorData = ClimateControl.Data.Entities.Sensor;
 
 namespace ClimateControl.AzureDb
 {
@@ -13,17 +10,31 @@ namespace ClimateControl.AzureDb
     {
         private readonly ClimateControlEntities _context = new ClimateControlEntities();
 
-        public IQueryable<Sensor> GetSensorData()
+        public IEnumerable<Sensor> GetSensorData()
         {
-            return from s in _context.SensorData select new Sensor
-            {
-                Id = s.Id,
-                DeviceId = s.deviceId,
-                Temperature = s.temperature,
-                Humidity = s.humidity,
-                CO2 = s.co2,
-                Timestamp = s.timestamp
-            };
+            var result = GetSensorDataFromDb();
+            return result.ToList();
+        }
+
+        private IQueryable<Sensor> GetSensorDataFromDb()
+        {
+            var result = from s in _context.SensorData
+                select new Sensor
+                {
+                    Id = s.Id,
+                    DeviceId = s.deviceId,
+                    Temperature = s.temperature,
+                    Humidity = s.humidity,
+                    CO2 = s.co2,
+                    Timestamp = s.timestamp
+                };
+            return result;
+        }
+
+        public IEnumerable<Sensor> GetSensorData(DateTime startTime, DateTime endTime)
+        {
+            var result = GetSensorDataFromDb().Where(s => s.Timestamp >= startTime && s.Timestamp <= endTime);
+            return result.ToList();
         }
 
         public Sensor GetSensorData(int? id)
@@ -41,6 +52,11 @@ namespace ClimateControl.AzureDb
             }
 
             return sensor;
+        }
+
+        public Sensor GetLatestSensorData()
+        {
+            return GetSensorDataFromDb().OrderByDescending(s => s.Timestamp).Take(1).SingleOrDefault();            
         }
 
         public void Dispose()
