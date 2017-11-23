@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
     <script>
 
-        var dataRange = "4 hours";
+        var dataRange = "8 hours";
         var chartUpdateInterval = 60000;
 
         var getTempUrl = '@Url.Action("GetTemperatures", "Sensor")' + "?range="+dataRange;
@@ -279,34 +279,42 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div align="center">
-                <div id="climatenow">
-                    @Html.Partial("ClimateNow", @Model)
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center">
+                    <div id="climatenow">
+                        @Html.Partial("ClimateNow", @Model)
+                    </div>
+                </div>
+                <br/>
+                <br/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center">
+                    <canvas width="800" height="300" id="TemperatureChart"></canvas>
+                </div>
+                <br />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center">
+                    <canvas width="800" height="300" id="HumidityChart"></canvas>
+                </div>
+                <br />
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div align="center">
+                    <canvas width="800" height="300" id="CO2Chart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div>
-                <canvas width="600" height="300" id="TemperatureChart"></canvas>
-            </div>
-           
-        </div>
-    </div>
-<div class="row">
-    <div class="col-md-6">
-        <div>
-            <canvas width="600" height="300" id="HumidityChart"></canvas>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div>
-            <canvas width="600" height="300" id="CO2Chart"></canvas>
-        </div> 
-    </div>
-</div>
     </div>
 </body>
 </html>
